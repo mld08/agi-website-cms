@@ -1,0 +1,200 @@
+/* ==========================================================================
+   AGI CMS — thème d'administration, fidèle à la charte graphique du site.
+   Poppins (texte) + Cormorant Garamond (grands titres) · couleurs de marque.
+   ========================================================================== */
+
+/* ---- Polices (sous-ensemble latin, couvre FR + EN) ---- */
+@font-face{font-family:'Poppins';font-weight:400;font-style:normal;font-display:swap;src:url('/static/fonts/poppins-400-latin.woff2') format('woff2');}
+@font-face{font-family:'Poppins';font-weight:500;font-style:normal;font-display:swap;src:url('/static/fonts/poppins-500-latin.woff2') format('woff2');}
+@font-face{font-family:'Poppins';font-weight:600;font-style:normal;font-display:swap;src:url('/static/fonts/poppins-600-latin.woff2') format('woff2');}
+@font-face{font-family:'Poppins';font-weight:700;font-style:normal;font-display:swap;src:url('/static/fonts/poppins-700-latin.woff2') format('woff2');}
+@font-face{font-family:'Cormorant Garamond';font-weight:500;font-style:normal;font-display:swap;src:url('/static/fonts/cormorantgaramond-500-latin.woff2') format('woff2');}
+@font-face{font-family:'Cormorant Garamond';font-weight:600;font-style:normal;font-display:swap;src:url('/static/fonts/cormorantgaramond-600-latin.woff2') format('woff2');}
+@font-face{font-family:'Cormorant Garamond';font-weight:700;font-style:normal;font-display:swap;src:url('/static/fonts/cormorantgaramond-700-latin.woff2') format('woff2');}
+@font-face{font-family:'Cormorant Garamond';font-weight:600;font-style:italic;font-display:swap;src:url('/static/fonts/cormorantgaramond-600-italic-latin.woff2') format('woff2');}
+
+:root{
+  --agi-red:#B22F28; --agi-red-dark:#8E1F1A;
+  --agi-olive:#5E6B27; --agi-olive-dark:#3F4A18; --agi-olive-deep:#2A3210;
+  --agi-orange:#DD8728; --agi-yellow:#E8B936; --agi-gold:#f3c01a;
+  --paper:#fff; --cream:#F8F2E2; --cream-2:#EFE7D1; --cream-3:#E5DCC0;
+  --ink:#181612; --ink-2:#3A352A; --ink-3:#6A6354;
+  --line:#E2D9BF; --line-2:#C9BE9E; --dark:#14110d;
+  --serif:'Cormorant Garamond',Georgia,serif;
+  --sans:'Poppins',system-ui,-apple-system,sans-serif;
+
+  /* Rebranding de Bootstrap via ses variables */
+  --bs-body-font-family:var(--sans);
+  --bs-body-bg:var(--cream);
+  --bs-body-color:var(--ink);
+  --bs-border-color:var(--line);
+  --bs-border-radius:.7rem; --bs-border-radius-sm:.5rem; --bs-border-radius-lg:1rem;
+  --bs-primary:#5E6B27; --bs-primary-rgb:94,107,39;
+  --bs-link-color:var(--agi-olive-dark); --bs-link-color-rgb:63,74,24;
+  --bs-link-hover-color:var(--agi-red); --bs-link-hover-color-rgb:178,47,40;
+  --bs-emphasis-color:var(--ink);
+  --bs-secondary-color:var(--ink-3);
+  --bs-tertiary-bg:var(--cream-2);
+}
+
+body{
+  background:
+    radial-gradient(1200px 500px at 100% -10%, rgba(232,185,54,.10), transparent 60%),
+    radial-gradient(900px 500px at -10% 110%, rgba(94,107,39,.08), transparent 55%),
+    var(--cream);
+  color:var(--ink);
+  font-family:var(--sans);
+  min-height:100vh;
+}
+
+/* ---- Barre supérieure (sombre, signature de marque) ---- */
+.navbar-agi{
+  background:linear-gradient(180deg,#1b1711,#14110d);
+  box-shadow:0 1px 0 rgba(0,0,0,.4);
+}
+.navbar-agi .navbar-brand{display:flex;align-items:center;gap:11px;color:var(--cream);}
+.navbar-agi .navbar-brand img{height:30px;width:auto;display:block;}
+.navbar-agi .brand-word{font-family:var(--serif);font-weight:600;font-size:1.32rem;letter-spacing:.01em;line-height:1;}
+.navbar-agi .brand-word small{display:block;font-family:var(--sans);font-weight:500;font-size:.56rem;letter-spacing:.28em;text-transform:uppercase;opacity:.6;margin-top:2px;}
+.navbar-agi .nav-link{
+  color:rgba(248,242,226,.82);font-size:.9rem;font-weight:500;
+  padding:.35rem .2rem;position:relative;transition:color .15s;
+}
+.navbar-agi .nav-link:hover{color:var(--agi-gold);}
+.navbar-agi .nav-link.active{color:#fff;}
+.navbar-agi .nav-link.active::after{
+  content:"";position:absolute;left:0;right:0;bottom:-3px;height:2px;border-radius:2px;
+  background:var(--agi-gold);
+}
+.navbar-agi .navbar-user{color:rgba(248,242,226,.5);font-size:.78rem;}
+
+/* Bande quadrichrome de la charte, sous la barre */
+.agi-stripe{display:flex;height:4px;}
+.agi-stripe>span{flex:1;}
+.agi-stripe>span:nth-child(1){background:var(--agi-red);}
+.agi-stripe>span:nth-child(2){background:var(--agi-olive);}
+.agi-stripe>span:nth-child(3){background:var(--agi-orange);}
+.agi-stripe>span:nth-child(4){background:var(--agi-yellow);}
+
+/* ---- Titres ---- */
+.container h1{
+  font-family:var(--serif);font-weight:600;letter-spacing:.005em;
+  color:var(--ink);font-size:clamp(1.9rem,3vw,2.5rem);
+}
+.page-eyebrow{
+  font-family:var(--sans);font-weight:600;font-size:.7rem;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--agi-olive);
+}
+.lang-col h6,.lang-col{font-family:var(--sans);}
+.lang-col h6{text-transform:uppercase;letter-spacing:.14em;font-size:.68rem;color:var(--ink-3);font-weight:600;}
+
+/* ---- Cartes ---- */
+.card{
+  background:var(--paper);
+  border:1px solid var(--line);
+  border-radius:var(--bs-border-radius);
+  box-shadow:0 1px 2px rgba(24,22,18,.04),0 10px 30px -18px rgba(24,22,18,.25);
+}
+.card.shadow-sm{box-shadow:0 1px 2px rgba(24,22,18,.04),0 12px 28px -20px rgba(24,22,18,.30)!important;}
+.card-body{padding:1.35rem 1.4rem;}
+
+/* ---- Boutons ---- */
+.btn{font-weight:600;border-radius:.6rem;letter-spacing:.005em;}
+.btn-gold{
+  background:linear-gradient(180deg,var(--agi-gold),var(--agi-yellow));
+  border:1px solid #d9a90c;color:var(--dark);
+  box-shadow:0 6px 16px -8px rgba(232,185,54,.8);
+}
+.btn-gold:hover{background:linear-gradient(180deg,#ffcf2b,#e6b220);color:var(--dark);}
+.btn-dark{
+  background:var(--agi-olive-deep);border-color:var(--agi-olive-deep);color:var(--cream);
+}
+.btn-dark:hover{background:#1d2510;border-color:#1d2510;color:#fff;}
+.btn-outline-secondary{color:var(--agi-olive-dark);border-color:var(--line-2);}
+.btn-outline-secondary:hover{background:var(--agi-olive);border-color:var(--agi-olive);color:#fff;}
+.btn-outline-danger{color:var(--agi-red);border-color:#e2b6b2;}
+.btn-outline-danger:hover{background:var(--agi-red);border-color:var(--agi-red);}
+.btn-outline-light{border-color:rgba(248,242,226,.35);color:var(--cream);}
+.btn-outline-light:hover{background:var(--agi-gold);border-color:var(--agi-gold);color:var(--dark);}
+
+/* ---- Formulaires ---- */
+.form-label{font-weight:500;color:var(--ink-2);font-size:.9rem;margin-bottom:.35rem;}
+.form-control,.form-select{
+  border-color:var(--line-2);border-radius:.55rem;color:var(--ink);
+  background-color:#fffdf8;
+}
+.form-control::placeholder{color:#b3a988;}
+.form-control:focus,.form-select:focus{
+  border-color:var(--agi-olive);
+  box-shadow:0 0 0 .2rem rgba(94,107,39,.18);
+  background-color:#fff;
+}
+.form-control-color{min-height:2.6rem;}
+.form-text{color:var(--ink-3);}
+.form-check-input:checked{background-color:var(--agi-olive);border-color:var(--agi-olive);}
+.form-check-input:focus{border-color:var(--agi-olive);box-shadow:0 0 0 .2rem rgba(94,107,39,.18);}
+
+/* ---- Tableaux ---- */
+.table{--bs-table-bg:transparent;--bs-table-color:var(--ink);margin-bottom:0;}
+.table>thead.table-light th{
+  background:var(--cream-2);color:var(--ink-2);
+  text-transform:uppercase;letter-spacing:.08em;font-size:.72rem;font-weight:600;
+  border-bottom:1px solid var(--line-2);
+}
+.table>tbody>tr{border-color:var(--line);}
+.table-hover>tbody>tr:hover>*{background:rgba(232,185,54,.08);}
+.table td,.table th{padding:.85rem 1rem;}
+
+/* ---- Badges (couleurs de marque) ---- */
+.badge{font-weight:600;letter-spacing:.02em;padding:.4em .7em;border-radius:.5rem;}
+.text-bg-success{background:var(--agi-olive)!important;color:#fff!important;}
+.text-bg-primary{background:var(--agi-olive-dark)!important;color:#fff!important;}
+.text-bg-secondary{background:var(--ink-3)!important;color:#fff!important;}
+.text-bg-info{background:var(--agi-orange)!important;color:#fff!important;}
+.text-bg-warning{background:var(--agi-yellow)!important;color:var(--dark)!important;}
+.text-bg-danger{background:var(--agi-red)!important;color:#fff!important;}
+.text-bg-dark{background:var(--dark)!important;color:var(--cream)!important;}
+.text-bg-light{background:var(--cream-2)!important;color:var(--ink-2)!important;}
+
+/* ---- Alertes ---- */
+.alert{border-radius:.7rem;border:1px solid transparent;}
+.alert-success{background:#eef0e1;border-color:#cdd4ab;color:var(--agi-olive-deep);}
+.alert-danger{background:#f7e6e4;border-color:#e6bdb8;color:var(--agi-red-dark);}
+.alert-info{background:#f6ecd9;border-color:#e6d3a8;color:#7a5b16;}
+
+/* ---- Aperçus d'images ---- */
+.img-preview{max-width:220px;border-radius:.6rem;border:1px solid var(--line-2);box-shadow:0 8px 22px -14px rgba(24,22,18,.4);}
+
+/* ---- Éditeur Quill aux couleurs de la marque ---- */
+.editor-wrap .ql-toolbar{border-color:var(--line-2);border-top-left-radius:.55rem;border-top-right-radius:.55rem;background:var(--cream);}
+.editor-wrap .ql-container{border-color:var(--line-2);min-height:190px;background:#fff;border-bottom-left-radius:.55rem;border-bottom-right-radius:.55rem;font-family:var(--sans);}
+.ql-snow .ql-stroke{stroke:var(--ink-2);}
+.ql-snow .ql-fill{fill:var(--ink-2);}
+.ql-snow.ql-toolbar button:hover .ql-stroke,.ql-snow .ql-toolbar button.ql-active .ql-stroke{stroke:var(--agi-olive);}
+.ql-snow.ql-toolbar button:hover .ql-fill,.ql-snow .ql-toolbar button.ql-active .ql-fill{fill:var(--agi-olive);}
+
+/* ---- Page de connexion ---- */
+.login-page{
+  background:
+    radial-gradient(900px 600px at 80% -10%, rgba(94,107,39,.30), transparent 60%),
+    radial-gradient(700px 500px at 0% 110%, rgba(178,47,40,.22), transparent 55%),
+    linear-gradient(180deg,#1b1711,#14110d);
+  min-height:100vh;display:flex;align-items:center;
+}
+.login-card{
+  background:rgba(255,255,255,.97);
+  border:1px solid rgba(255,255,255,.5);
+  border-radius:1.1rem;
+  box-shadow:0 40px 90px -40px rgba(0,0,0,.7);
+  overflow:hidden;
+}
+.login-card .login-head{text-align:center;padding:2rem 2rem .5rem;}
+.login-card .login-head img{height:54px;width:auto;}
+.login-card .login-title{font-family:var(--serif);font-weight:600;font-size:1.7rem;color:var(--ink);margin:.8rem 0 0;}
+.login-card .login-sub{font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--agi-olive);font-weight:600;}
+.login-stripe{display:flex;height:5px;}
+.login-stripe>span{flex:1;}
+.login-stripe>span:nth-child(1){background:var(--agi-red);}
+.login-stripe>span:nth-child(2){background:var(--agi-olive);}
+.login-stripe>span:nth-child(3){background:var(--agi-orange);}
+.login-stripe>span:nth-child(4){background:var(--agi-yellow);}

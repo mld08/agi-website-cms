@@ -1,0 +1,20 @@
+{% for p in programs %}    <article class="init"{% if p.anchor %} id="{{ p.anchor }}"{% endif %}>
+      <div class="init-media">
+        <img width="{{ p.image_w }}" height="{{ p.image_h }}" src="../assets/{{ p.image }}" alt="{{ p.alt }}" loading="lazy">
+        <span class="init-num">{{ '%02d' % loop.index }}</span>
+      </div>
+      <div class="init-body">
+        <p class="init-cat">{{ p.category }}</p>
+        <h2 class="init-title">{{ p.title }}</h2>
+        <p class="init-where">{{ p.where }}</p>
+        <p class="init-lead">{{ p.lead }}</p>
+        <ul class="init-points">
+{% for pt in p.points %}          <li>{{ pt }}</li>
+{% endfor %}        </ul>
+{% if p.fund or p.link_href %}        <div class="init-foot">
+{% if p.fund %}          <span class="init-fund">{{ p.fund | safe }}</span>
+{% endif %}{% if p.link_href %}          <a class="init-link" href="{{ p.link_href }}"{% if p.link_external %} target="_blank" rel="noopener"{% endif %}>{{ p.link_label }} {% if p.link_external %}<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>{% else %}<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>{% endif %}</a>
+{% endif %}        </div>
+{% endif %}      </div>
+    </article>
+{% endfor %}

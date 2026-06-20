@@ -1,0 +1,140 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ 'Modifier' if member else 'Nouveau' }} membre{% endblock %}
+
+{% macro preview_url(path) -%}
+{%- if path %}{% if path.startswith('uploads/') %}{{ url_for('media', filename=path[8:]) }}{% else %}{{ url_for('asset_preview', filename=path) }}{% endif %}{% endif -%}
+{%- endmacro %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1 class="h3 mb-0">{{ 'Modifier le membre' if member else 'Nouveau membre' }}</h1>
+  <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('admin.team_list') }}">← Retour</a>
+</div>
+
+<form method="post" id="member-form">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="row g-4">
+    <div class="col-lg-8">
+      <div class="card shadow-sm mb-4">
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6 lang-col">
+              <h6>Français</h6>
+              <label class="form-label" for="name_fr">Nom</label>
+              <input class="form-control mb-3" id="name_fr" name="name_fr" value="{{ member and member.name_fr or '' }}">
+              <label class="form-label" for="role_fr">Fonction</label>
+              <input class="form-control" id="role_fr" name="role_fr" value="{{ member and member.role_fr or '' }}">
+            </div>
+            <div class="col-md-6 lang-col">
+              <h6>English</h6>
+              <label class="form-label" for="name_en">Name</label>
+              <input class="form-control mb-3" id="name_en" name="name_en" value="{{ member and member.name_en or '' }}">
+              <label class="form-label" for="role_en">Role</label>
+              <input class="form-control" id="role_en" name="role_en" value="{{ member and member.role_en or '' }}">
+            </div>
+          </div>
+          <p class="text-secondary small mt-2 mb-0">Le texte alternatif des photos est composé automatiquement : « Nom, Fonction ».</p>
+        </div>
+      </div>
+
+      <div class="card shadow-sm mb-4">
+        <div class="card-body">
+          <div class="row g-4">
+            <div class="col-md-6">
+              <h6 class="lang-col">Photo principale</h6>
+              {% set pp = preview_url(member.photo if member else '') %}
+              <img id="photo-preview" class="img-preview mb-2 {{ '' if pp else 'd-none' }}" src="{{ pp }}" alt="">
+              <input class="form-control mb-2" type="file" id="photo-file" accept="image/*">
+              <input class="form-control mb-2" id="photo" name="photo" value="{{ member and member.photo or '' }}" placeholder="team/nom.jpg">
+              <div class="row g-2">
+                <div class="col"><label class="form-label small" for="photo_w">Largeur</label>
+                  <input class="form-control" type="number" id="photo_w" name="photo_w" value="{{ member.photo_w if member else 900 }}"></div>
+                <div class="col"><label class="form-label small" for="photo_h">Hauteur</label>
+                  <input class="form-control" type="number" id="photo_h" name="photo_h" value="{{ member.photo_h if member else 1350 }}"></div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <h6 class="lang-col">Photo au survol (facultative)</h6>
+              {% set ph = preview_url(member.photo_hover if member else '') %}
+              <img id="hover-preview" class="img-preview mb-2 {{ '' if ph else 'd-none' }}" src="{{ ph }}" alt="">
+              <input class="form-control mb-2" type="file" id="hover-file" accept="image/*">
+              <input class="form-control mb-2" id="photo_hover" name="photo_hover" value="{{ member and member.photo_hover or '' }}" placeholder="team/nom-full.jpg">
+              <div class="row g-2">
+                <div class="col"><label class="form-label small" for="photo_hover_w">Largeur</label>
+                  <input class="form-control" type="number" id="photo_hover_w" name="photo_hover_w" value="{{ member.photo_hover_w if member else 0 }}"></div>
+                <div class="col"><label class="form-label small" for="photo_hover_h">Hauteur</label>
+                  <input class="form-control" type="number" id="photo_hover_h" name="photo_hover_h" value="{{ member.photo_hover_h if member else 0 }}"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="card shadow-sm mb-4">
+        <div class="card-body">
+          <label class="form-label" for="status">Statut</label>
+          <select class="form-select mb-3" id="status" name="status">
+            <option value="draft" {{ 'selected' if not member or member.status != 'published' else '' }}>Brouillon</option>
+            <option value="published" {{ 'selected' if member and member.status == 'published' else '' }}>Publié</option>
+          </select>
+
+          <label class="form-label" for="sort_index">Ordre d’affichage</label>
+          <input class="form-control mb-3" type="number" min="0" id="sort_index" name="sort_index" value="{{ member.sort_index if member else 0 }}">
+
+          <label class="form-label" for="accent_color">Couleur d’accent</label>
+          <input class="form-control form-control-color mb-3" type="color" id="accent_color" name="accent_color" value="{{ member and member.accent_color or '#5E6B27' }}" title="Accent de la carte">
+
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" id="has_page" name="has_page" {{ 'checked' if member and member.has_page else '' }}>
+            <label class="form-check-label" for="has_page">Carte cliquable (page dédiée)</label>
+            <div class="form-text">Ne cochez que si une page <code>team-&lt;identifiant&gt;.html</code> existe.</div>
+          </div>
+
+          <label class="form-label" for="slug">Identifiant (slug)</label>
+          <input class="form-control" id="slug" name="slug" value="{{ member and member.slug or '' }}" placeholder="généré depuis le nom">
+        </div>
+      </div>
+      <button class="btn btn-gold w-100 py-2" type="submit">Enregistrer</button>
+    </div>
+  </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const csrf = document.querySelector('meta[name="csrf-token"]').content;
+
+  function wireUpload(fileId, pathId, wId, hId, prevId) {
+    const f = document.getElementById(fileId);
+    f.addEventListener('change', async (e) => {
+      const file = e.target.files[0]; if (!file) return;
+      const fd = new FormData(); fd.append('file', file);
+      const res = await fetch('{{ url_for("admin.upload") }}', { method:'POST', headers:{'X-CSRFToken':csrf}, body:fd });
+      const data = await res.json();
+      if (!res.ok) { alert(data.error || 'Erreur'); return; }
+      document.getElementById(pathId).value = data.path;
+      if (data.width)  document.getElementById(wId).value = data.width;
+      if (data.height) document.getElementById(hId).value = data.height;
+      const p = document.getElementById(prevId);
+      if (p) { p.src = data.url; p.classList.remove('d-none'); }
+    });
+  }
+  wireUpload('photo-file', 'photo', 'photo_w', 'photo_h', 'photo-preview');
+  wireUpload('hover-file', 'photo_hover', 'photo_hover_w', 'photo_hover_h', 'hover-preview');
+
+  // Slug suggéré depuis le nom tant qu'il est vide.
+  const slugInput = document.getElementById('slug');
+  let touched = slugInput.value.trim() !== '';
+  slugInput.addEventListener('input', () => { touched = slugInput.value.trim() !== ''; });
+  function suggest() {
+    if (touched) return;
+    const src = document.getElementById('name_en').value || document.getElementById('name_fr').value;
+    if (src) slugInput.value = src.normalize('NFKD').replace(/[̀-ͯ]/g, '')
+                                  .replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-+|-+$/g, '').toLowerCase();
+  }
+  document.getElementById('name_en').addEventListener('blur', suggest);
+  document.getElementById('name_fr').addEventListener('blur', suggest);
+</script>
+{% endblock %}

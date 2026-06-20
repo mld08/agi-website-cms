@@ -1,0 +1,15 @@
+# Secrets et environnement
+.env
+
+# Base SQLite locale
+instance/
+
+# Site généré (sortie de build)
+/public/
+../public/
+
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/

@@ -1,0 +1,143 @@
+/* =========================================================
+   Africa Governance Institute — error pages
+   Shared layout for 404 / 403 / 500. Accent set per page
+   via the body class (.err-404 / .err-403 / .err-500).
+   ========================================================= */
+
+.err-main {
+  --err-accent: var(--agi-olive);
+  position: relative;
+  overflow: hidden;
+  background: var(--cream);
+  border-bottom: 1px solid var(--line);
+}
+body.err-403 .err-main { --err-accent: var(--agi-orange); }
+body.err-500 .err-main { --err-accent: var(--agi-red); }
+
+/* Faint brand orbit drifting behind the figure */
+.err-main .arc-orbit {
+  width: min(1100px, 150vw);
+  left: 50%;
+  top: 46%;
+  transform: translate(-50%, -50%);
+  opacity: 0.05;
+}
+
+.err-inner {
+  position: relative;
+  z-index: 1;
+  min-height: clamp(560px, 72vh, 760px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding-top: 80px;
+  padding-bottom: 96px;
+}
+
+.err-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--err-accent);
+  margin-bottom: 6px;
+}
+.err-eyebrow .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--err-accent);
+  flex: 0 0 8px;
+}
+
+.err-code {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: clamp(140px, 26vw, 320px);
+  line-height: 0.82;
+  letter-spacing: -0.03em;
+  color: var(--err-accent);
+  margin: 4px 0 8px;
+}
+
+.err-title {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: clamp(30px, 4.4vw, 52px);
+  line-height: 1.04;
+  letter-spacing: -0.012em;
+  color: var(--ink);
+  margin: 0;
+  text-wrap: balance;
+}
+
+.err-text {
+  font-family: var(--sans);
+  font-size: clamp(16px, 1.4vw, 19px);
+  line-height: 1.6;
+  color: var(--ink-2);
+  max-width: 520px;
+  margin: 20px auto 0;
+  text-wrap: pretty;
+}
+
+.err-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  justify-content: center;
+  margin-top: 38px;
+}
+
+/* Popular pages, below a hairline */
+.err-suggest {
+  margin-top: 56px;
+  padding-top: 30px;
+  border-top: 1px solid var(--line-2);
+  width: min(620px, 100%);
+}
+.err-suggest-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 16px;
+}
+.err-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px 12px;
+}
+.err-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border: 1px solid var(--line-2);
+  border-radius: 999px;
+  background: var(--paper);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink-2);
+  transition: border-color .2s, color .2s, background .2s;
+}
+.err-links a:hover {
+  border-color: var(--err-accent);
+  color: var(--err-accent);
+}
+.err-links a svg { color: var(--err-accent); }
+
+@media (max-width: 560px) {
+  .err-inner { padding-top: 56px; padding-bottom: 72px; }
+  .err-actions { flex-direction: column; align-items: stretch; width: 100%; max-width: 320px; }
+  .err-actions .btn { justify-content: center; }
+}

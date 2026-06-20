@@ -1,0 +1,63 @@
+{% extends "admin/base.html" %}
+{% block title %}Comptes{% endblock %}
+
+{% block content %}
+<div class="page-eyebrow">Accès &amp; sécurité</div>
+<h1 class="mb-4">Comptes</h1>
+
+<div class="row g-4">
+  <div class="col-lg-7">
+    <div class="card shadow-sm">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr><th>E-mail</th><th>Rôle</th><th class="text-end">Actions</th></tr>
+          </thead>
+          <tbody>
+            {% for u in users %}
+            <tr>
+              <td>{{ u.email }}{% if u.id == current_user.id %} <span class="text-secondary small">(vous)</span>{% endif %}</td>
+              <td>
+                {% if u.role == 'admin' %}<span class="badge text-bg-dark">Admin</span>
+                {% else %}<span class="badge text-bg-secondary">Éditeur</span>{% endif %}
+              </td>
+              <td class="text-end">
+                {% if u.id != current_user.id %}
+                <form method="post" action="{{ url_for('admin.user_delete', user_id=u.id) }}"
+                      onsubmit="return confirm('Supprimer ce compte ?');">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button class="btn btn-sm btn-outline-danger" type="submit">Supprimer</button>
+                </form>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h2 class="h6 mb-3">Nouveau compte</h2>
+        <form method="post" action="{{ url_for('admin.user_new') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <label class="form-label" for="email">E-mail</label>
+          <input class="form-control mb-3" id="email" name="email" type="email" required>
+          <label class="form-label" for="password">Mot de passe</label>
+          <input class="form-control mb-3" id="password" name="password" type="text" required
+                 placeholder="Choisissez un mot de passe robuste">
+          <label class="form-label" for="role">Rôle</label>
+          <select class="form-select mb-3" id="role" name="role">
+            <option value="editor">Éditeur (gère le contenu)</option>
+            <option value="admin">Admin (gère aussi les comptes)</option>
+          </select>
+          <button class="btn btn-gold w-100" type="submit">Créer le compte</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

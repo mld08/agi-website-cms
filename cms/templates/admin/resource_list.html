@@ -1,0 +1,67 @@
+{% extends "admin/base.html" %}
+{% block title %}Ressources{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <div class="page-eyebrow">Médias &amp; publications</div>
+    <h1 class="mb-0">Ressources</h1>
+  </div>
+  <div class="d-flex gap-2">
+    <a class="btn btn-gold" href="{{ url_for('admin.resource_new') }}">+ Nouvelle ressource</a>
+    <form method="post" action="{{ url_for('admin.publish') }}"
+          onsubmit="return confirm('Générer le site public ?');">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button class="btn btn-dark" type="submit">Générer le site</button>
+    </form>
+  </div>
+</div>
+
+<p class="text-secondary small">Publications (PDF) et vidéos affichées sur la page Ressources.</p>
+
+<div class="card shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Type</th>
+          <th>Titre</th>
+          <th>Statut</th>
+          <th class="text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in resources %}
+        <tr>
+          <td>
+            {% if r.kind == 'video' %}<span class="badge text-bg-info">Vidéo</span>
+            {% elif r.kind == 'gallery' %}<span class="badge text-bg-warning text-dark">Galerie</span>
+            {% else %}<span class="badge text-bg-primary">Publication</span>{% endif %}
+          </td>
+          <td>
+            <a class="text-decoration-none fw-semibold" href="{{ url_for('admin.resource_edit', resource_id=r.id) }}">
+              {{ r.title_fr or r.title_en or '(sans titre)' }}
+            </a>
+            <div class="text-secondary small">{{ r.subtitle_fr or r.subtitle_en or r.pdf_file or r.video_embed or r.image }}</div>
+          </td>
+          <td>
+            {% if r.status == 'published' %}<span class="badge text-bg-success">Publié</span>
+            {% else %}<span class="badge text-bg-secondary">Brouillon</span>{% endif %}
+          </td>
+          <td class="text-end text-nowrap">
+            <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('admin.resource_edit', resource_id=r.id) }}">Modifier</a>
+            <form class="d-inline" method="post" action="{{ url_for('admin.resource_delete', resource_id=r.id) }}"
+                  onsubmit="return confirm('Supprimer cette ressource ?');">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button class="btn btn-sm btn-outline-danger" type="submit">Supprimer</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" class="text-center text-secondary py-4">Aucune ressource.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

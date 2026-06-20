@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "cms",
+      "runtimeExecutable": "cms/.venv/Scripts/python.exe",
+      "runtimeArgs": ["-c", "import os; os.chdir('cms'); from app import app; app.run(port=5050)"],
+      "port": 5050
+    }
+  ]
+}

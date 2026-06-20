@@ -1,0 +1,169 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ 'Modifier' if resource else 'Nouvelle' }} ressource{% endblock %}
+
+{% macro preview_url(path) -%}
+{%- if path %}{% if path.startswith('uploads/') %}{{ url_for('media', filename=path[8:]) }}{% else %}{{ url_for('asset_preview', filename=path) }}{% endif %}{% endif -%}
+{%- endmacro %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1 class="h3 mb-0">{{ 'Modifier la ressource' if resource else 'Nouvelle ressource' }}</h1>
+  <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('admin.resource_list') }}">← Retour</a>
+</div>
+
+<form method="post" id="resource-form">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="row g-4">
+    <div class="col-lg-8">
+      <div class="card shadow-sm mb-4">
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6 lang-col">
+              <h6>Français</h6>
+              <label class="form-label" for="title_fr">Titre</label>
+              <input class="form-control mb-3" id="title_fr" name="title_fr" value="{{ resource and resource.title_fr or '' }}">
+              <label class="form-label" for="subtitle_fr">Sous-titre</label>
+              <input class="form-control" id="subtitle_fr" name="subtitle_fr" value="{{ resource and resource.subtitle_fr or '' }}" placeholder="ex. PDF · Rapport…">
+            </div>
+            <div class="col-md-6 lang-col">
+              <h6>English</h6>
+              <label class="form-label" for="title_en">Title</label>
+              <input class="form-control mb-3" id="title_en" name="title_en" value="{{ resource and resource.title_en or '' }}">
+              <label class="form-label" for="subtitle_en">Subtitle</label>
+              <input class="form-control" id="subtitle_en" name="subtitle_en" value="{{ resource and resource.subtitle_en or '' }}">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card shadow-sm mb-4 kind-pub">
+        <div class="card-body">
+          <h6 class="lang-col">Publication (PDF)</h6>
+          <input class="form-control mb-2" type="file" id="pdf-file" accept="application/pdf">
+          <div id="pdf-status" class="form-text mb-2">
+            {% if resource and resource.pdf_file %}Fichier actuel : {{ resource.pdf_file }}{% endif %}
+          </div>
+          <label class="form-label small" for="pdf_file">Chemin du fichier (dans assets/)</label>
+          <input class="form-control" id="pdf_file" name="pdf_file" value="{{ resource and resource.pdf_file or '' }}" placeholder="coastal-futures-rapport.pdf">
+        </div>
+      </div>
+
+      <div class="card shadow-sm mb-4 kind-video">
+        <div class="card-body">
+          <h6 class="lang-col">Vidéo</h6>
+          <label class="form-label" for="video_embed">URL d’intégration (YouTube nocookie)</label>
+          <input class="form-control mb-3" id="video_embed" name="video_embed" value="{{ resource and resource.video_embed or '' }}" placeholder="https://www.youtube-nocookie.com/embed/XXXX?autoplay=1">
+          <h6 class="lang-col">Image d’aperçu</h6>
+          {% set vp = preview_url(resource.video_image if resource else '') %}
+          <img id="vimg-preview" class="img-preview mb-2 {{ '' if vp else 'd-none' }}" src="{{ vp }}" alt="">
+          <input class="form-control mb-2" type="file" id="vimg-file" accept="image/*">
+          <input class="form-control mb-2" id="video_image" name="video_image" value="{{ resource and resource.video_image or '' }}" placeholder="coastal/cf-room.webp">
+          <div class="row g-2">
+            <div class="col"><label class="form-label small" for="video_image_w">Largeur</label>
+              <input class="form-control" type="number" id="video_image_w" name="video_image_w" value="{{ resource.video_image_w if resource else 1080 }}"></div>
+            <div class="col"><label class="form-label small" for="video_image_h">Hauteur</label>
+              <input class="form-control" type="number" id="video_image_h" name="video_image_h" value="{{ resource.video_image_h if resource else 720 }}"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card shadow-sm mb-4 kind-gallery">
+        <div class="card-body">
+          <h6 class="lang-col">Photo de galerie</h6>
+          {% set gp = preview_url(resource.image if resource else '') %}
+          <img id="gimg-preview" class="img-preview mb-2 {{ '' if gp else 'd-none' }}" src="{{ gp }}" alt="">
+          <input class="form-control mb-2" type="file" id="gimg-file" accept="image/*">
+          <input class="form-control mb-2" id="image" name="image" value="{{ resource and resource.image or '' }}" placeholder="coastal/cf-audience.webp">
+          <div class="row g-2 mb-3">
+            <div class="col"><label class="form-label small" for="image_w">Largeur</label>
+              <input class="form-control" type="number" id="image_w" name="image_w" value="{{ resource.image_w if resource else 1600 }}"></div>
+            <div class="col"><label class="form-label small" for="image_h">Hauteur</label>
+              <input class="form-control" type="number" id="image_h" name="image_h" value="{{ resource.image_h if resource else 1066 }}"></div>
+          </div>
+          <label class="form-label" for="variant">Mise en page</label>
+          <select class="form-select" id="variant" name="variant">
+            <option value="" {{ 'selected' if not resource or resource.variant == '' else '' }}>Normale</option>
+            <option value="wide" {{ 'selected' if resource and resource.variant == 'wide' else '' }}>Large</option>
+            <option value="tall" {{ 'selected' if resource and resource.variant == 'tall' else '' }}>Haute</option>
+          </select>
+          <p class="text-secondary small mt-2 mb-0">Le « titre » ci-dessus sert de texte alternatif (accessibilité).</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="card shadow-sm mb-4">
+        <div class="card-body">
+          <label class="form-label" for="kind">Type</label>
+          <select class="form-select mb-3" id="kind" name="kind">
+            <option value="publication" {{ 'selected' if not resource or resource.kind == 'publication' else '' }}>Publication (PDF)</option>
+            <option value="video" {{ 'selected' if resource and resource.kind == 'video' else '' }}>Vidéo</option>
+            <option value="gallery" {{ 'selected' if resource and resource.kind == 'gallery' else '' }}>Galerie (photo)</option>
+          </select>
+
+          <label class="form-label" for="status">Statut</label>
+          <select class="form-select mb-3" id="status" name="status">
+            <option value="draft" {{ 'selected' if not resource or resource.status != 'published' else '' }}>Brouillon</option>
+            <option value="published" {{ 'selected' if resource and resource.status == 'published' else '' }}>Publié</option>
+          </select>
+
+          <label class="form-label" for="sort_index">Ordre d’affichage</label>
+          <input class="form-control" type="number" min="0" id="sort_index" name="sort_index" value="{{ resource.sort_index if resource else 0 }}">
+        </div>
+      </div>
+      <button class="btn btn-gold w-100 py-2" type="submit">Enregistrer</button>
+    </div>
+  </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const csrf = document.querySelector('meta[name="csrf-token"]').content;
+
+  async function uploadTo(file, pathId, opts) {
+    const fd = new FormData(); fd.append('file', file);
+    const res = await fetch('{{ url_for("admin.upload") }}', { method:'POST', headers:{'X-CSRFToken':csrf}, body:fd });
+    const data = await res.json();
+    if (!res.ok) { alert(data.error || 'Erreur'); return null; }
+    document.getElementById(pathId).value = data.path;
+    return data;
+  }
+
+  document.getElementById('pdf-file').addEventListener('change', async (e) => {
+    const f = e.target.files[0]; if (!f) return;
+    const d = await uploadTo(f, 'pdf_file');
+    if (d) document.getElementById('pdf-status').textContent = 'Fichier ajouté : ' + d.path;
+  });
+
+  document.getElementById('vimg-file').addEventListener('change', async (e) => {
+    const f = e.target.files[0]; if (!f) return;
+    const d = await uploadTo(f, 'video_image');
+    if (d) {
+      if (d.width)  document.getElementById('video_image_w').value = d.width;
+      if (d.height) document.getElementById('video_image_h').value = d.height;
+      const p = document.getElementById('vimg-preview'); p.src = d.url; p.classList.remove('d-none');
+    }
+  });
+
+  document.getElementById('gimg-file').addEventListener('change', async (e) => {
+    const f = e.target.files[0]; if (!f) return;
+    const d = await uploadTo(f, 'image');
+    if (d) {
+      if (d.width)  document.getElementById('image_w').value = d.width;
+      if (d.height) document.getElementById('image_h').value = d.height;
+      const p = document.getElementById('gimg-preview'); p.src = d.url; p.classList.remove('d-none');
+    }
+  });
+
+  // Affiche uniquement les champs du type choisi.
+  function toggleKind() {
+    const k = document.getElementById('kind').value;
+    document.querySelectorAll('.kind-pub').forEach(el => el.style.display = k === 'publication' ? '' : 'none');
+    document.querySelectorAll('.kind-video').forEach(el => el.style.display = k === 'video' ? '' : 'none');
+    document.querySelectorAll('.kind-gallery').forEach(el => el.style.display = k === 'gallery' ? '' : 'none');
+  }
+  document.getElementById('kind').addEventListener('change', toggleKind);
+  toggleKind();
+</script>
+{% endblock %}

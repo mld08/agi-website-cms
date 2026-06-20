@@ -1,0 +1,149 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ 'Modifier' if program else 'Nouveau' }} programme{% endblock %}
+
+{% macro preview_url(path) -%}
+{%- if path %}{% if path.startswith('uploads/') %}{{ url_for('media', filename=path[8:]) }}{% else %}{{ url_for('asset_preview', filename=path) }}{% endif %}{% endif -%}
+{%- endmacro %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1 class="h3 mb-0">{{ 'Modifier le programme' if program else 'Nouveau programme' }}</h1>
+  <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('admin.program_list') }}">← Retour</a>
+</div>
+
+<form method="post" id="program-form">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="row g-4">
+    <div class="col-lg-8">
+      <div class="card shadow-sm mb-4">
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6 lang-col">
+              <h6>Français</h6>
+              <label class="form-label" for="title_fr">Titre</label>
+              <input class="form-control mb-3" id="title_fr" name="title_fr" value="{{ program and program.title_fr or '' }}">
+              <label class="form-label" for="category_fr">Catégorie</label>
+              <input class="form-control mb-3" id="category_fr" name="category_fr" value="{{ program and program.category_fr or '' }}">
+              <label class="form-label" for="where_fr">Lieu · période</label>
+              <input class="form-control mb-3" id="where_fr" name="where_fr" value="{{ program and program.where_fr or '' }}">
+              <label class="form-label" for="lead_fr">Présentation</label>
+              <textarea class="form-control mb-3" rows="4" id="lead_fr" name="lead_fr">{{ program and program.lead_fr or '' }}</textarea>
+              <label class="form-label" for="points_fr">Points clés <span class="text-secondary">(une puce par ligne)</span></label>
+              <textarea class="form-control mb-3" rows="3" id="points_fr" name="points_fr">{{ program and program.points_fr or '' }}</textarea>
+              <label class="form-label" for="fund_fr">Financement / mention</label>
+              <input class="form-control" id="fund_fr" name="fund_fr" value="{{ program and program.fund_fr or '' }}">
+            </div>
+            <div class="col-md-6 lang-col">
+              <h6>English</h6>
+              <label class="form-label" for="title_en">Title</label>
+              <input class="form-control mb-3" id="title_en" name="title_en" value="{{ program and program.title_en or '' }}">
+              <label class="form-label" for="category_en">Category</label>
+              <input class="form-control mb-3" id="category_en" name="category_en" value="{{ program and program.category_en or '' }}">
+              <label class="form-label" for="where_en">Where · when</label>
+              <input class="form-control mb-3" id="where_en" name="where_en" value="{{ program and program.where_en or '' }}">
+              <label class="form-label" for="lead_en">Lead</label>
+              <textarea class="form-control mb-3" rows="4" id="lead_en" name="lead_en">{{ program and program.lead_en or '' }}</textarea>
+              <label class="form-label" for="points_en">Key points <span class="text-secondary">(one per line)</span></label>
+              <textarea class="form-control mb-3" rows="3" id="points_en" name="points_en">{{ program and program.points_en or '' }}</textarea>
+              <label class="form-label" for="fund_en">Funding / credit</label>
+              <input class="form-control" id="fund_en" name="fund_en" value="{{ program and program.fund_en or '' }}">
+            </div>
+          </div>
+          <p class="text-secondary small mt-2 mb-0">Le champ « financement » accepte un peu de HTML (ex. <code>&lt;strong&gt;AGI&lt;/strong&gt;</code>).</p>
+        </div>
+      </div>
+
+      <div class="card shadow-sm mb-4">
+        <div class="card-body">
+          <h6 class="lang-col">Image</h6>
+          {% set pp = preview_url(program.image if program else '') %}
+          <img id="img-preview" class="img-preview mb-2 {{ '' if pp else 'd-none' }}" src="{{ pp }}" alt="">
+          <input class="form-control mb-2" type="file" id="img-file" accept="image/*">
+          <input class="form-control mb-2" id="image" name="image" value="{{ program and program.image or '' }}" placeholder="programs/mon-image.webp">
+          <div class="row g-2 mb-3">
+            <div class="col"><label class="form-label small" for="image_w">Largeur</label>
+              <input class="form-control" type="number" id="image_w" name="image_w" value="{{ program.image_w if program else 1080 }}"></div>
+            <div class="col"><label class="form-label small" for="image_h">Hauteur</label>
+              <input class="form-control" type="number" id="image_h" name="image_h" value="{{ program.image_h if program else 720 }}"></div>
+          </div>
+          <div class="row g-3">
+            <div class="col-md-6"><label class="form-label" for="image_alt_fr">Texte alternatif (FR)</label>
+              <input class="form-control" id="image_alt_fr" name="image_alt_fr" value="{{ program and program.image_alt_fr or '' }}"></div>
+            <div class="col-md-6"><label class="form-label" for="image_alt_en">Alt text (EN)</label>
+              <input class="form-control" id="image_alt_en" name="image_alt_en" value="{{ program and program.image_alt_en or '' }}"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="card shadow-sm mb-4">
+        <div class="card-body">
+          <label class="form-label" for="status">Statut</label>
+          <select class="form-select mb-3" id="status" name="status">
+            <option value="draft" {{ 'selected' if not program or program.status != 'published' else '' }}>Brouillon</option>
+            <option value="published" {{ 'selected' if program and program.status == 'published' else '' }}>Publié</option>
+          </select>
+
+          <label class="form-label" for="sort_index">Ordre d’affichage</label>
+          <input class="form-control mb-3" type="number" min="0" id="sort_index" name="sort_index" value="{{ program.sort_index if program else 0 }}">
+
+          <label class="form-label" for="anchor">Ancre (id, facultatif)</label>
+          <input class="form-control mb-3" id="anchor" name="anchor" value="{{ program and program.anchor or '' }}" placeholder="ex. coastal">
+
+          <label class="form-label" for="slug">Identifiant (slug)</label>
+          <input class="form-control" id="slug" name="slug" value="{{ program and program.slug or '' }}" placeholder="généré depuis le titre">
+        </div>
+      </div>
+
+      <div class="card shadow-sm mb-4">
+        <div class="card-body">
+          <h6 class="lang-col">Lien (facultatif)</h6>
+          <label class="form-label" for="link_href">URL</label>
+          <input class="form-control mb-2" id="link_href" name="link_href" value="{{ program and program.link_href or '' }}" placeholder="coastal-futures.html ou https://…">
+          <div class="row g-2 mb-2">
+            <div class="col"><label class="form-label small" for="link_label_fr">Libellé (FR)</label>
+              <input class="form-control" id="link_label_fr" name="link_label_fr" value="{{ program and program.link_label_fr or '' }}"></div>
+            <div class="col"><label class="form-label small" for="link_label_en">Label (EN)</label>
+              <input class="form-control" id="link_label_en" name="link_label_en" value="{{ program and program.link_label_en or '' }}"></div>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="link_external" name="link_external" {{ 'checked' if program and program.link_external else '' }}>
+            <label class="form-check-label" for="link_external">Lien externe (nouvel onglet)</label>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-gold w-100 py-2" type="submit">Enregistrer</button>
+    </div>
+  </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const csrf = document.querySelector('meta[name="csrf-token"]').content;
+  document.getElementById('img-file').addEventListener('change', async (e) => {
+    const file = e.target.files[0]; if (!file) return;
+    const fd = new FormData(); fd.append('file', file);
+    const res = await fetch('{{ url_for("admin.upload") }}', { method:'POST', headers:{'X-CSRFToken':csrf}, body:fd });
+    const data = await res.json();
+    if (!res.ok) { alert(data.error || 'Erreur'); return; }
+    document.getElementById('image').value = data.path;
+    if (data.width)  document.getElementById('image_w').value = data.width;
+    if (data.height) document.getElementById('image_h').value = data.height;
+    const p = document.getElementById('img-preview'); p.src = data.url; p.classList.remove('d-none');
+  });
+
+  const slugInput = document.getElementById('slug');
+  let touched = slugInput.value.trim() !== '';
+  slugInput.addEventListener('input', () => { touched = slugInput.value.trim() !== ''; });
+  function suggest() {
+    if (touched) return;
+    const src = document.getElementById('title_en').value || document.getElementById('title_fr').value;
+    if (src) slugInput.value = src.normalize('NFKD').replace(/[̀-ͯ]/g, '')
+                                  .replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-+|-+$/g, '').toLowerCase();
+  }
+  document.getElementById('title_en').addEventListener('blur', suggest);
+  document.getElementById('title_fr').addEventListener('blur', suggest);
+</script>
+{% endblock %}

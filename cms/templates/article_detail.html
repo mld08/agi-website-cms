@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block body_class %}report-page{% endblock %}
+
+{% block page_title %}{{ a.title }} · Africa Governance Institute{% endblock %}
+
+{% block head_meta %}
+<meta name="description" content="{{ a.deck }}">
+<meta name="author" content="{{ a.author }}">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="{{ canonical }}">
+<link rel="alternate" hreflang="en" href="{{ alt_en_abs }}">
+<link rel="alternate" hreflang="fr" href="{{ alt_fr_abs }}">
+<link rel="alternate" hreflang="x-default" href="{{ alt_fr_abs }}">
+<meta property="og:type" content="article">
+<meta property="og:title" content="{{ a.title }}">
+<meta property="og:description" content="{{ a.deck }}">
+<meta property="og:url" content="{{ canonical }}">
+{% if og_image %}<meta property="og:image" content="{{ og_image }}">{% endif %}
+<meta property="og:site_name" content="Africa Governance Institute">
+<meta property="article:published_time" content="{{ a.iso_date }}">
+<meta name="twitter:card" content="summary_large_image">
+{% if og_image %}<meta name="twitter:image" content="{{ og_image }}">{% endif %}
+{% endblock %}
+
+{% block head_extra %}
+<link rel="stylesheet" href="../styles.css?v=4">
+<link rel="stylesheet" href="../news.css?v=4">
+<style>.prose img{max-width:100%;height:auto;border-radius:12px;margin:24px 0;display:block}</style>
+{% autoescape false %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "NewsArticle",
+  "headline": {{ a.title | tojson }},
+  "datePublished": {{ a.iso_date | tojson }},
+  "author": { "@type": "Organization", "name": {{ a.author | tojson }} },
+  "publisher": { "@type": "Organization", "name": "Africa Governance Institute" },
+  "mainEntityOfPage": {{ canonical | tojson }}{% if og_image %},
+  "image": {{ og_image | tojson }}{% endif %}
+}
+</script>
+{% endautoescape %}
+{% endblock %}
+
+{% block main %}
+<section class="art-mast">
+  <div class="wrap">
+    <nav class="crumbs">
+      <a href="index.html">{{ home_label }}</a>
+      <span class="sep">/</span>
+      <a href="news.html">{{ news_label }}</a>
+      <span class="sep">/</span>
+      <span class="now">{{ a.category }}</span>
+    </nav>
+
+    <div class="art-meta-row">
+      <span class="cat">{{ a.category }}</span>
+      <span><time datetime="{{ a.iso_date }}">{{ a.long_date }}</time></span>
+      <span class="dot">·</span>
+      <span>{{ a.read_minutes }} {{ t.read_suffix }}</span>
+    </div>
+
+    <h1 class="art-headline">{{ a.title }}</h1>
+    {% if a.deck %}<p class="art-deck">{{ a.deck }}</p>{% endif %}
+
+    <div class="art-byline">
+      <div class="art-author">
+        <div class="art-avatar is-logo"><img width="256" height="256" src="../assets/favicon-256.png" alt="Africa Governance Institute"></div>
+        <div class="info">
+          <span class="name">{{ a.author }}</span>
+          <span class="role">{{ t.by }} · {{ a.long_date }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if a.image %}
+  <div class="wrap">
+    <figure class="art-figure">
+      <img width="{{ a.image_w }}" height="{{ a.image_h }}" src="../assets/{{ a.image }}" alt="{{ a.alt }}">
+    </figure>
+  </div>
+  {% endif %}
+</section>
+
+<section class="article-body">
+  <div class="wrap article-grid">
+    <article class="prose">
+      {{ a.body | safe }}
+    </article>
+  </div>
+</section>
+{% endblock %}

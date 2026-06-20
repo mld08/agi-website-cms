@@ -1,0 +1,10 @@
+# AGI CMS — dépendances Python (Phase 1)
+Flask==3.0.3
+Flask-SQLAlchemy==3.1.1
+python-dotenv==1.0.1
+# Pilote MySQL pour la production cPanel. En local, on utilise SQLite (aucun pilote requis).
+PyMySQL==1.1.1
+# Phase 2 : administration
+Flask-Login==0.6.3
+Flask-WTF==1.2.1
+Pillow==10.4.0

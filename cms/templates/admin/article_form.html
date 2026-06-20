@@ -1,0 +1,239 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ 'Modifier' if article else 'Nouvel' }} article{% endblock %}
+
+{% block head_extra %}
+<link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1 class="h3 mb-0">{{ 'Modifier l’article' if article else 'Nouvel article' }}</h1>
+  <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('admin.dashboard') }}">← Retour</a>
+</div>
+
+<form method="post" id="article-form">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+  <div class="row g-4">
+    <div class="col-lg-8">
+
+      <div class="card shadow-sm mb-4">
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6 lang-col">
+              <h6>Français</h6>
+              <label class="form-label" for="title_fr">Titre</label>
+              <input class="form-control" id="title_fr" name="title_fr" value="{{ article and article.title_fr or '' }}">
+            </div>
+            <div class="col-md-6 lang-col">
+              <h6>English</h6>
+              <label class="form-label" for="title_en">Title</label>
+              <input class="form-control" id="title_en" name="title_en" value="{{ article and article.title_en or '' }}">
+            </div>
+
+            <div class="col-md-6 lang-col">
+              <label class="form-label" for="category_fr">Catégorie</label>
+              <input class="form-control" id="category_fr" name="category_fr" value="{{ article and article.category_fr or '' }}">
+            </div>
+            <div class="col-md-6 lang-col">
+              <label class="form-label" for="category_en">Category</label>
+              <input class="form-control" id="category_en" name="category_en" value="{{ article and article.category_en or '' }}">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card shadow-sm mb-4">
+        <div class="card-body">
+          <div class="row g-4">
+            <div class="col-md-6">
+              <h6 class="lang-col">Corps · Français</h6>
+              <div class="editor-wrap"><div id="editor_fr"></div></div>
+              <textarea class="d-none" name="body_fr" id="body_fr">{{ article and article.body_fr or '' }}</textarea>
+            </div>
+            <div class="col-md-6">
+              <h6 class="lang-col">Body · English</h6>
+              <div class="editor-wrap"><div id="editor_en"></div></div>
+              <textarea class="d-none" name="body_en" id="body_en">{{ article and article.body_en or '' }}</textarea>
+            </div>
+          </div>
+          <p class="text-secondary small mt-2 mb-0">Le corps servira à la page complète de l’article (étape suivante). La liste des actualités utilise le titre, la catégorie et l’image.</p>
+        </div>
+      </div>
+
+      <div class="card shadow-sm mb-4">
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-12"><p class="text-secondary small mb-0">Résumé court (chapô). Sert d’introduction sur la page article <em>et</em> de description pour les moteurs de recherche / réseaux sociaux.</p></div>
+            <div class="col-md-6 lang-col">
+              <label class="form-label" for="meta_description_fr">Résumé (FR)</label>
+              <textarea class="form-control" rows="2" id="meta_description_fr" name="meta_description_fr">{{ article and article.meta_description_fr or '' }}</textarea>
+            </div>
+            <div class="col-md-6 lang-col">
+              <label class="form-label" for="meta_description_en">Summary (EN)</label>
+              <textarea class="form-control" rows="2" id="meta_description_en" name="meta_description_en">{{ article and article.meta_description_en or '' }}</textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="col-lg-4">
+      <div class="card shadow-sm mb-4">
+        <div class="card-body">
+          <label class="form-label" for="status">Statut</label>
+          <select class="form-select mb-3" id="status" name="status">
+            <option value="draft" {{ 'selected' if not article or article.status != 'published' else '' }}>Brouillon</option>
+            <option value="published" {{ 'selected' if article and article.status == 'published' else '' }}>Publié</option>
+          </select>
+
+          <label class="form-label" for="pub_date">Date de publication</label>
+          <input class="form-control mb-3" type="date" id="pub_date" name="pub_date"
+                 value="{{ article.pub_date.strftime('%Y-%m-%d') if article else '' }}">
+
+          <label class="form-label" for="author">Auteur</label>
+          <input class="form-control mb-3" id="author" name="author" value="{{ article.author if article else 'Africa Governance Institute' }}">
+
+          <label class="form-label" for="read_minutes">Temps de lecture (min)</label>
+          <input class="form-control mb-3" type="number" min="1" id="read_minutes" name="read_minutes" value="{{ article.read_minutes if article else 5 }}">
+
+          <label class="form-label" for="slug">Identifiant (slug)</label>
+          <input class="form-control" id="slug" name="slug" value="{{ article and article.slug or '' }}" placeholder="généré depuis le titre">
+          <div class="form-text">Laissez vide : il sera créé depuis le titre. Sert d’URL : <code>slug.html</code>.</div>
+
+          <div class="form-check mt-3">
+            <input class="form-check-input" type="checkbox" id="managed_detail" name="managed_detail"
+                   {{ 'checked' if (article is none or article.managed_detail) else '' }}>
+            <label class="form-check-label" for="managed_detail">Générer automatiquement la page de l’article</label>
+            <div class="form-text">Décochez uniquement si une page sur-mesure existe déjà pour cet article.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card shadow-sm mb-4">
+        <div class="card-body">
+          <h6 class="lang-col">Image de la carte</h6>
+          {% set preview_url = '' %}
+          {% if article and article.image %}
+            {% if article.image.startswith('uploads/') %}
+              {% set preview_url = url_for('media', filename=article.image[8:]) %}
+            {% else %}
+              {% set preview_url = url_for('asset_preview', filename=article.image) %}
+            {% endif %}
+          {% endif %}
+          <img id="img-preview" class="img-preview mb-2 {{ '' if preview_url else 'd-none' }}" src="{{ preview_url }}" alt="">
+          <input class="form-control mb-2" type="file" id="img-file" accept="image/*">
+          <div id="upload-status" class="form-text mb-2"></div>
+
+          <label class="form-label small" for="image">Chemin (dans assets/)</label>
+          <input class="form-control mb-2" id="image" name="image" value="{{ article and article.image or '' }}" placeholder="uploads/mon-image.webp">
+          <div class="row g-2">
+            <div class="col"><label class="form-label small" for="image_w">Largeur</label>
+              <input class="form-control" type="number" id="image_w" name="image_w" value="{{ article.image_w if article else 1080 }}"></div>
+            <div class="col"><label class="form-label small" for="image_h">Hauteur</label>
+              <input class="form-control" type="number" id="image_h" name="image_h" value="{{ article.image_h if article else 720 }}"></div>
+          </div>
+
+          <hr>
+          <label class="form-label" for="image_alt_fr">Texte alternatif (FR)</label>
+          <input class="form-control mb-2" id="image_alt_fr" name="image_alt_fr" value="{{ article and article.image_alt_fr or '' }}">
+          <label class="form-label" for="image_alt_en">Alt text (EN)</label>
+          <input class="form-control" id="image_alt_en" name="image_alt_en" value="{{ article and article.image_alt_en or '' }}">
+        </div>
+      </div>
+
+      <button class="btn btn-gold w-100 py-2" type="submit">Enregistrer</button>
+      {% if article %}
+      <div class="d-grid gap-2 mt-2">
+        <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('admin.article_preview', article_id=article.id, lang='fr') }}" target="_blank" rel="noopener">Prévisualiser (FR) ↗</a>
+        <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('admin.article_preview', article_id=article.id, lang='en') }}" target="_blank" rel="noopener">Preview (EN) ↗</a>
+      </div>
+      <p class="text-secondary small mt-2 mb-0">Enregistrez d’abord pour prévisualiser vos dernières modifications.</p>
+      {% endif %}
+    </div>
+  </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.min.js"></script>
+<script>
+  const csrf = document.querySelector('meta[name="csrf-token"]').content;
+
+  // Éditeurs visuels (un par langue), synchronisés vers les <textarea> à la soumission.
+  const toolbar = [['bold','italic','underline','link','image'], [{header:[2,3,false]}], [{list:'ordered'},{list:'bullet'}], ['blockquote'], ['clean']];
+
+  // Insère une image dans le corps en la téléversant (URL /assets/uploads/…,
+  // valable à l'identique dans l'éditeur et sur le site publié).
+  function imageHandler() {
+    const quill = this.quill;
+    const input = document.createElement('input');
+    input.type = 'file'; input.accept = 'image/*';
+    input.onchange = async () => {
+      const file = input.files[0]; if (!file) return;
+      const fd = new FormData(); fd.append('file', file);
+      const res = await fetch('{{ url_for("admin.upload") }}', { method:'POST', headers:{'X-CSRFToken':csrf}, body:fd });
+      const data = await res.json();
+      if (!res.ok) { alert(data.error || 'Erreur'); return; }
+      const range = quill.getSelection(true);
+      quill.insertEmbed(range.index, 'image', '/assets/' + data.path);
+      quill.setSelection(range.index + 1);
+    };
+    input.click();
+  }
+
+  function makeEditor(id, hiddenId) {
+    const q = new Quill('#' + id, {
+      theme: 'snow',
+      modules: { toolbar: { container: toolbar, handlers: { image: imageHandler } } },
+    });
+    const initial = document.getElementById(hiddenId).value;
+    if (initial) q.clipboard.dangerouslyPasteHTML(initial);
+    return q;
+  }
+  const qfr = makeEditor('editor_fr', 'body_fr');
+  const qen = makeEditor('editor_en', 'body_en');
+
+  document.getElementById('article-form').addEventListener('submit', function () {
+    document.getElementById('body_fr').value = qfr.root.innerHTML;
+    document.getElementById('body_en').value = qen.root.innerHTML;
+  });
+
+  // Slug suggéré depuis le titre tant que l'utilisateur n'a pas saisi le sien.
+  const slugInput = document.getElementById('slug');
+  let slugTouched = slugInput.value.trim() !== '';
+  slugInput.addEventListener('input', () => { slugTouched = slugInput.value.trim() !== ''; });
+  function slugify(s) {
+    return s.normalize('NFKD').replace(/[̀-ͯ]/g, '')
+            .replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-+|-+$/g, '').toLowerCase();
+  }
+  function suggestSlug() {
+    if (slugTouched) return;
+    const src = document.getElementById('title_en').value || document.getElementById('title_fr').value;
+    if (src) slugInput.value = slugify(src);
+  }
+  document.getElementById('title_en').addEventListener('blur', suggestSlug);
+  document.getElementById('title_fr').addEventListener('blur', suggestSlug);
+
+  // Upload d'image : dimensions détectées côté serveur, champs remplis automatiquement.
+  document.getElementById('img-file').addEventListener('change', async function (e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const status = document.getElementById('upload-status');
+    status.textContent = 'Téléversement…';
+    const fd = new FormData(); fd.append('file', file);
+    try {
+      const res = await fetch('{{ url_for("admin.upload") }}', { method:'POST', headers:{'X-CSRFToken':csrf}, body:fd });
+      const data = await res.json();
+      if (!res.ok) { status.textContent = data.error || 'Erreur'; return; }
+      document.getElementById('image').value = data.path;
+      if (data.width) document.getElementById('image_w').value = data.width;
+      if (data.height) document.getElementById('image_h').value = data.height;
+      const prev = document.getElementById('img-preview');
+      prev.src = data.url; prev.classList.remove('d-none');
+      status.textContent = 'Image ajoutée : ' + data.path;
+    } catch (err) { status.textContent = 'Échec du téléversement.'; }
+  });
+</script>
+{% endblock %}

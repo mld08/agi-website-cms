@@ -1,0 +1,19 @@
+<div class="team-grid">
+{% for m in members %}{% if m.has_page %}      <a class="tm-card" href="team-{{ m.slug }}.html" style="--tint:{{ m.accent }};">
+{% else %}      <div class="tm-card tm-static" style="--tint:{{ m.accent }};">
+{% endif %}        <span class="tm-ring"></span>
+        <div class="tm-photo">
+          <img width="{{ m.photo_w }}" height="{{ m.photo_h }}" src="../assets/{{ m.photo }}" alt="{{ m.alt }}" loading="lazy">
+{% if m.photo_hover %}          <img width="{{ m.photo_hover_w }}" height="{{ m.photo_hover_h }}" class="alt" src="../assets/{{ m.photo_hover }}" alt="" aria-hidden="true" loading="lazy">
+{% endif %}        </div>
+        <div class="tm-meta">
+          <span class="tm-num">{{ '%02d' % loop.index }}</span>
+          <div>
+            <h3>{{ m.name }}</h3>
+            <span class="tm-role">{{ m.role }}</span>
+          </div>
+{% if m.has_page %}          <span class="tm-go"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+{% endif %}        </div>
+{% if m.has_page %}      </a>
+{% else %}      </div>
+{% endif %}{% endfor %}    </div>

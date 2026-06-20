@@ -1,0 +1,4 @@
+{% for r in items %}        <button class="rs-shot{% if r.variant %} {{ r.variant }}{% endif %}" type="button">
+          <img src="../assets/{{ r.image }}" alt="{{ r.title }}" width="{{ r.image_w }}" height="{{ r.image_h }}" loading="lazy">
+        </button>
+{% endfor %}

@@ -1,0 +1,69 @@
+{% extends "admin/base.html" %}
+{% block title %}Articles{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <div class="page-eyebrow">Contenu éditorial</div>
+    <h1 class="mb-0">Actualités</h1>
+  </div>
+  <div class="d-flex gap-2">
+    <a class="btn btn-gold" href="{{ url_for('admin.article_new') }}">+ Nouvel article</a>
+    <form method="post" action="{{ url_for('admin.publish') }}"
+          onsubmit="return confirm('Générer le site public avec les articles publiés ?');">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button class="btn btn-dark" type="submit">Générer le site</button>
+    </form>
+  </div>
+</div>
+
+<p class="text-secondary small">
+  « Brouillon » = non visible sur le site. « Publié » = mis en ligne au prochain
+  clic sur <strong>Générer le site</strong>.
+</p>
+
+<div class="card shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Titre (FR)</th>
+          <th>Date</th>
+          <th>Statut</th>
+          <th class="text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for a in articles %}
+        <tr>
+          <td>
+            <a class="text-decoration-none fw-semibold" href="{{ url_for('admin.article_edit', article_id=a.id) }}">
+              {{ a.title_fr or a.title_en or a.slug }}
+            </a>
+            <div class="text-secondary small">{{ a.category_fr or a.category_en }}</div>
+          </td>
+          <td class="text-nowrap">{{ a.pub_date.strftime('%d/%m/%Y') }}</td>
+          <td>
+            {% if a.status == 'published' %}
+              <span class="badge text-bg-success">Publié</span>
+            {% else %}
+              <span class="badge text-bg-secondary">Brouillon</span>
+            {% endif %}
+          </td>
+          <td class="text-end text-nowrap">
+            <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('admin.article_edit', article_id=a.id) }}">Modifier</a>
+            <form class="d-inline" method="post" action="{{ url_for('admin.article_delete', article_id=a.id) }}"
+                  onsubmit="return confirm('Supprimer définitivement cet article ?');">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button class="btn btn-sm btn-outline-danger" type="submit">Supprimer</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" class="text-center text-secondary py-4">Aucun article pour l'instant.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

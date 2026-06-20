@@ -1,0 +1,6 @@
+{% for r in items %}        <button type="button" class="rs-video-facade" data-embed="{{ r.video_embed }}" aria-label="{{ play_label }} {{ r.title }}">
+          <img src="../assets/{{ r.video_image }}" alt="" width="{{ r.video_image_w }}" height="{{ r.video_image_h }}" loading="lazy">
+          <span class="rs-video-play"><svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"></path></svg></span>
+          <span class="rs-video-label">{{ r.title }}</span>
+        </button>
+{% endfor %}

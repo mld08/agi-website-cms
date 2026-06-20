@@ -1,0 +1,35 @@
+{% extends "admin/base.html" %}
+{% block title %}Connexion{% endblock %}
+{% block body_class %}login-page{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center w-100">
+  <div class="col-sm-10 col-md-7 col-lg-5 col-xl-4">
+    <div class="login-card">
+      <div class="login-stripe"><span></span><span></span><span></span><span></span></div>
+      <div class="login-head">
+        <img src="/static/logo.png" alt="Africa Governance Institute">
+        <div class="login-sub">Espace d’administration</div>
+        <h1 class="login-title">Bienvenue</h1>
+      </div>
+      <div class="card-body px-4 pb-4 pt-2">
+        <form method="post">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <div class="mb-3">
+            <label class="form-label" for="email">Adresse e-mail</label>
+            <input class="form-control" id="email" name="email" type="email" required autofocus>
+          </div>
+          <div class="mb-4">
+            <label class="form-label" for="password">Mot de passe</label>
+            <input class="form-control" id="password" name="password" type="password" required>
+          </div>
+          <button class="btn btn-gold w-100 py-2" type="submit">Se connecter</button>
+        </form>
+      </div>
+    </div>
+    <p class="text-center mt-3 mb-0" style="color:rgba(248,242,226,.55);font-size:.78rem;letter-spacing:.04em">
+      Institut Africain de la Gouvernance · CMS
+    </p>
+  </div>
+</div>
+{% endblock %}

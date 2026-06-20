@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block page_title %}{{ news.title }}{% endblock %}
+
+{% block head_meta %}
+<meta name="description" content="{{ news.description }}">
+<meta name="author" content="{{ news.author_meta }}">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="{{ canonical }}">
+<link rel="alternate" hreflang="en" href="{{ alt_en_abs }}">
+<link rel="alternate" hreflang="fr" href="{{ alt_fr_abs }}">
+<link rel="alternate" hreflang="x-default" href="{{ alt_fr_abs }}">
+<meta property="og:type" content="website">
+<meta property="og:title" content="{{ news.og_title }}">
+<meta property="og:description" content="{{ news.og_description }}">
+<meta property="og:url" content="{{ canonical }}">
+<meta property="og:image" content="{{ og_image }}">
+<meta property="og:site_name" content="Africa Governance Institute">
+<meta property="og:image:alt" content="{{ news.og_image_alt }}">
+<meta property="og:image:width" content="1080">
+<meta property="og:image:height" content="720">
+<meta name="twitter:image" content="{{ og_image }}">
+<meta name="twitter:card" content="summary_large_image">
+{% endblock %}
+
+{% block head_extra %}
+<link rel="stylesheet" href="../styles.css?v=4">
+<link rel="stylesheet" href="../news.css?v=4">
+{% autoescape false %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": {{ news.crumb_home | tojson }},
+      "item": {{ home_url | tojson }}
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": {{ news.crumb_now | tojson }},
+      "item": {{ canonical | tojson }}
+    }
+  ]
+}
+</script>
+{% endautoescape %}
+{% endblock %}
+
+{% block main %}
+<!-- ============================================================
+     NEWS LISTING — généré par le CMS depuis la base de données
+     ============================================================ -->
+<section class="news-mast">
+  <div class="wrap">
+    <nav class="crumbs">
+      <a href="index.html">{{ news.crumb_home }}</a>
+      <span class="sep">/</span>
+      <span class="now">{{ news.crumb_now }}</span>
+    </nav>
+    <span class="eyebrow">{{ news.eyebrow }}</span>
+    <h1 class="h-display">{{ news.h1 }}</h1>
+    <p class="news-deck">{{ news.deck }}</p>
+  </div>
+</section>
+
+<section class="news-list">
+  <div class="wrap">
+    <div class="news-grid">
+      {% for a in articles %}
+      <article class="article-card">
+        <a href="{{ a.url }}" class="ac-img">
+          <div class="ac-date"><span class="day">{{ a.day }}</span><span class="mon">{{ a.mon }}</span></div>
+          <img width="{{ a.image_w }}" height="{{ a.image_h }}" src="../assets/{{ a.image }}" alt="{{ a.alt }}" class="ac-photo" loading="lazy">
+        </a>
+        <div class="ac-body">
+          <span class="ac-cat">{{ a.category }}</span>
+          <h2 class="h-card"><a href="{{ a.url }}">{{ a.title }}</a></h2>
+          <p class="ac-meta">{{ t.by }} <strong>{{ a.author }}</strong> · {{ a.read_minutes }} {{ t.read_suffix }}</p>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+    <div class="news-more">
+      <div class="nm-copy">
+        <h2>{{ news.more_h2 }}</h2>
+        <p>{{ news.more_p }}</p>
+      </div>
+      <a class="nm-link" href="#newsletter">{{ news.more_link }}
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}

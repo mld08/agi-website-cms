@@ -1,0 +1,381 @@
+/* =========================================================
+   Africa Governance Institute — Who We Are page
+   ========================================================= */
+
+/* ---------- Masthead ---------- */
+.wwa-mast {
+  position: relative;
+  background: var(--cream);
+  border-bottom: 1px solid var(--line);
+  overflow: hidden;
+}
+.wwa-mast-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.wwa-mast-bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 26%;
+  opacity: 0.14;
+  filter: saturate(0.9);
+}
+.wwa-mast-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(248,242,226,0.55), rgba(248,242,226,0) 45%, rgba(248,242,226,0.75));
+}
+.wwa-mast-inner {
+  position: relative;
+  z-index: 1;
+  padding-top: clamp(36px, 4.5vw, 56px);
+  padding-bottom: clamp(48px, 6vw, 84px);
+}
+.wwa-mast .crumbs {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--ink-3);
+  margin-bottom: clamp(28px, 3.5vw, 48px);
+}
+.wwa-mast .crumbs a:hover { color: var(--agi-red); }
+.wwa-mast .crumbs .now { color: var(--ink); }
+.wwa-mast-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+  gap: 28px clamp(40px, 5vw, 96px);
+  align-items: end;
+}
+.wwa-mast h1 { margin: 18px 0 0; }
+.wwa-mast h1 em { font-style: italic; color: var(--agi-red); }
+.wwa-deck {
+  font-size: clamp(16px, 1.5vw, 19px);
+  line-height: 1.6;
+  color: var(--ink-2);
+  margin: 0 0 10px;
+}
+@media (max-width: 900px) {
+  .wwa-mast-row { grid-template-columns: 1fr; }
+  .wwa-deck { margin: 0; max-width: 600px; }
+}
+
+/* ---------- Story ---------- */
+.wwa-story { padding: clamp(72px, 9vw, 130px) 0 0; }
+.wwa-story-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.6fr);
+  gap: 48px clamp(48px, 6vw, 110px);
+  align-items: start;
+}
+.wwa-story-left { position: sticky; top: 120px; }
+.wwa-story-left .h-section { margin-top: 16px; }
+.wwa-story-right .lead { margin: 0 0 22px; }
+.wwa-story-right p { margin: 0 0 22px; color: var(--ink-2); }
+.wwa-story-right p strong { color: var(--ink); }
+.wwa-dropcap::first-letter {
+  font-family: var(--serif);
+  font-size: 3.4em;
+  line-height: 0.82;
+  float: left;
+  padding: 6px 12px 0 0;
+  color: var(--agi-red);
+  font-weight: 600;
+}
+
+/* Fact strip */
+.wwa-facts {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  overflow: hidden;
+  margin: clamp(56px, 7vw, 96px) 0 0;
+  background: var(--paper);
+}
+.wwa-fact {
+  padding: clamp(24px, 3vw, 40px) clamp(20px, 2.6vw, 36px);
+  border-right: 1px solid var(--line);
+}
+.wwa-fact:last-child { border-right: none; }
+.wwa-fact .num {
+  font-family: var(--serif);
+  font-size: clamp(38px, 4vw, 58px);
+  line-height: 1;
+  font-weight: 500;
+  color: var(--agi-red);
+  display: block;
+}
+.wwa-fact .lbl {
+  display: block;
+  margin-top: 12px;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  line-height: 1.6;
+}
+@media (max-width: 900px) {
+  .wwa-story-grid { grid-template-columns: 1fr; }
+  .wwa-story-left { position: static; }
+  .wwa-facts { grid-template-columns: 1fr 1fr; }
+  .wwa-fact:nth-child(2) { border-right: none; }
+  .wwa-fact:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+}
+
+/* ---------- Mandate pillars ---------- */
+.wwa-mandate { padding: clamp(72px, 9vw, 130px) 0; }
+.wwa-mandate-head { max-width: 760px; margin-bottom: clamp(40px, 5vw, 64px); }
+.wwa-mandate-head .h-section { margin-top: 16px; }
+.wwa-pillars {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(20px, 2.5vw, 36px);
+}
+.wwa-pillar {
+  border-top: 2px solid var(--ink);
+  padding-top: 26px;
+}
+.wwa-pillar .p-num {
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  color: var(--agi-red);
+}
+.wwa-pillar h3 {
+  font-family: var(--serif);
+  font-size: 28px;
+  font-weight: 500;
+  margin: 14px 0 12px;
+}
+.wwa-pillar p { margin: 0; color: var(--ink-2); font-size: 15.5px; line-height: 1.65; }
+@media (max-width: 800px) { .wwa-pillars { grid-template-columns: 1fr; } }
+
+/* ---------- Team photo band ---------- */
+.wwa-band { position: relative; }
+.wwa-band img {
+  width: 100%;
+  height: clamp(340px, 52vw, 660px);
+  object-fit: cover;
+}
+.wwa-band-caption {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  padding: 16px var(--gutter);
+  background: linear-gradient(to top, rgba(24, 22, 18, 0.72), rgba(24, 22, 18, 0));
+  color: var(--cream);
+  font-family: var(--mono);
+  font-size: 11.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ---------- Team grid ---------- */
+.wwa-team {
+  background: var(--cream);
+  padding: clamp(72px, 9vw, 130px) 0 clamp(80px, 10vw, 140px);
+}
+.wwa-team-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 32px;
+  margin-bottom: clamp(44px, 5vw, 72px);
+}
+.wwa-team-head .h-section { margin-top: 16px; max-width: 640px; }
+.wwa-team-head .lead { max-width: 380px; font-size: 16px; margin: 0; }
+@media (max-width: 900px) {
+  .wwa-team-head { flex-direction: column; align-items: flex-start; }
+}
+
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(28px, 3.4vw, 52px) clamp(22px, 2.6vw, 40px);
+}
+@media (max-width: 980px) { .team-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 560px) { .team-grid { grid-template-columns: 1fr; max-width: 380px; margin-inline: auto; } }
+
+.tm-card {
+  display: block;
+  position: relative;
+  --tint: var(--agi-red);
+}
+.tm-photo {
+  position: relative;
+  aspect-ratio: 3 / 3.7;
+  border-radius: 300px 300px 22px 22px;
+  overflow: hidden;
+  background: #EFD9BD;
+  isolation: isolate;
+}
+.tm-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1px solid rgba(24, 22, 18, 0.10);
+  pointer-events: none;
+}
+.tm-photo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 12%;
+  transition: opacity .55s ease, transform .9s cubic-bezier(.2,.6,.2,1);
+}
+.tm-photo img.alt {
+  opacity: 0;
+  object-position: 50% 0%;
+}
+a.tm-card:hover .tm-photo img.alt,
+a.tm-card:focus-visible .tm-photo img.alt,
+.tm-static:hover .tm-photo img.alt { opacity: 1; }
+a.tm-card:hover .tm-photo img,
+a.tm-card:focus-visible .tm-photo img,
+.tm-static:hover .tm-photo img { transform: scale(1.03); }
+
+/* tinted halo ring behind the arch */
+.tm-card .tm-ring {
+  position: absolute;
+  inset: -10px -10px auto;
+  height: calc(100% - 60px);
+  border-radius: 300px 300px 0 0;
+  border: 1.5px solid var(--tint);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity .45s ease, transform .45s ease;
+  pointer-events: none;
+}
+a.tm-card:hover .tm-ring,
+a.tm-card:focus-visible .tm-ring { opacity: 0.85; transform: translateY(0); }
+
+.tm-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding: 20px 6px 0;
+}
+.tm-num {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--tint);
+  letter-spacing: 0.1em;
+  flex-shrink: 0;
+}
+.tm-meta h3 {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 24px;
+  line-height: 1.12;
+  margin: 0;
+  transition: color .25s;
+}
+a.tm-card:hover .tm-meta h3 { color: var(--tint); }
+.tm-role {
+  display: block;
+  margin-top: 7px;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  line-height: 1.6;
+}
+.tm-go {
+  margin-left: auto;
+  align-self: center;
+  flex-shrink: 0;
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--line-2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-2);
+  transition: background .3s, color .3s, border-color .3s, transform .3s;
+}
+a.tm-card:hover .tm-go {
+  background: var(--tint);
+  border-color: var(--tint);
+  color: #fff;
+  transform: translateX(3px);
+}
+/* static card (no profile page): same photo swap on hover, no arrow */
+.tm-static { cursor: default; }
+.tm-static .tm-go { display: none; }
+.tm-static:hover .tm-ring { opacity: 0.85; transform: translateY(0); }
+
+/* ---------- Closing CTA ---------- */
+.wwa-cta {
+  background: var(--agi-olive-deep);
+  color: var(--cream);
+  padding: clamp(72px, 9vw, 120px) 0;
+  position: relative;
+  overflow: hidden;
+}
+.wwa-cta-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+}
+.wwa-cta .h-section { color: var(--cream); max-width: 660px; margin-top: 16px; }
+.wwa-cta-arcs {
+  position: absolute;
+  right: -80px;
+  top: -160px;
+  width: 480px;
+  opacity: 0.5;
+  pointer-events: none;
+}
+@media (max-width: 900px) {
+  .wwa-cta-inner { flex-direction: column; align-items: flex-start; }
+}
+
+/* Touch & keyboard parity for the full-pose photo reveal (UX-501 / UX-701).
+   site.js adds .has-alt + the tap affordance, and toggles .show-alt on tap. */
+.tm-card.show-alt .tm-photo img.alt { opacity: 1; }
+.tm-card.show-alt .tm-photo img { transform: scale(1.03); }
+.tm-card.show-alt .tm-ring { opacity: 0.85; transform: translateY(0); }
+.tm-flip-hint {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  z-index: 3;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  background: rgba(24, 22, 18, 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  pointer-events: none;
+  transition: background .3s ease;
+}
+@media (hover: none) {
+  .tm-card.has-alt .tm-flip-hint { display: inline-flex; }
+  .tm-card.show-alt .tm-flip-hint { background: var(--tint); }
+}
+
+/* Editorial labels in sentence case */
+.tm-role { text-transform: none; letter-spacing: 0.01em; }
+.wwa-fact .lbl { text-transform: none; letter-spacing: 0.01em; }
+.wwa-band-caption { text-transform: none; letter-spacing: 0.02em; }
