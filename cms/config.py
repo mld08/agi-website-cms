@@ -9,9 +9,8 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 # Dossiers de référence.
-BASE_DIR = Path(__file__).resolve().parent          # .../cms
-PROJECT_DIR = BASE_DIR.parent                        # .../AGI-Website
-TEMPLATE_DIR = PROJECT_DIR / "template"              # le site statique d'origine (design source)
+BASE_DIR = Path(__file__).resolve().parent          # dossier de l'app (cms/ en local)
+PROJECT_DIR = BASE_DIR.parent                        # parent (AGI-Website en local, home sur le serveur)
 
 # Charge le fichier .env s'il existe.
 load_dotenv(BASE_DIR / ".env")
@@ -32,13 +31,18 @@ class Config:
     SQLALCHEMY_DATABASE_URI = _database_url()
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+    # Installation web sans terminal : jeton secret + identifiants du 1er admin.
+    # Laissez SETUP_TOKEN vide pour DÉSACTIVER la page /setup (recommandé après install).
+    SETUP_TOKEN = os.environ.get("SETUP_TOKEN", "").strip()
+    ADMIN_EMAIL = os.environ.get("ADMIN_EMAIL", "").strip().lower()
+    ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "")
+
     # Génération du site.
     SITE_URL = os.environ.get("SITE_URL", "https://africagovernanceinstitute.org").rstrip("/")
-    OUTPUT_DIR = Path(
-        os.environ.get("OUTPUT_DIR")
-        or (PROJECT_DIR / "public")
-    ).resolve()
-    TEMPLATE_DIR = TEMPLATE_DIR
+    # Dossier de sortie du site généré (en prod : public_html). Défaut local : ../public
+    OUTPUT_DIR = Path(os.environ.get("OUTPUT_DIR") or (PROJECT_DIR / "public")).resolve()
+    # Dossier du site d'origine (design source). Surchargé par .env en prod.
+    TEMPLATE_DIR = Path(os.environ.get("TEMPLATE_DIR") or (PROJECT_DIR / "template")).resolve()
 
     # Uploads (images + documents). Copiés vers public/assets/uploads à la génération.
     UPLOAD_DIR = BASE_DIR / "uploads"

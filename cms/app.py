@@ -12,8 +12,10 @@ Commandes (depuis le dossier cms/, après « pip install -r requirements.txt »)
     flask --app app rebuild                          # init-db + seed + build
     flask --app app run                              # lance l'admin (http://127.0.0.1:5000/admin)
 """
+import os
 import click
-from flask import Flask, redirect, url_for
+from flask import Flask, redirect, url_for, abort
+from markupsafe import escape
 from flask_login import LoginManager
 from flask_wtf import CSRFProtect
 
@@ -47,6 +49,60 @@ def create_app(config: type = Config) -> Flask:
     @app.route("/")
     def home():
         return redirect(url_for("admin.dashboard"))
+
+    @app.route("/setup/<token>")
+    def first_run_setup(token):
+        """Installation sans terminal (à usage unique).
+
+        Protégée par SETUP_TOKEN (.env). Crée les tables, insère le contenu de
+        départ, crée le 1er compte admin (ADMIN_EMAIL / ADMIN_PASSWORD) et génère
+        le site. Idempotente. Désactivez-la ensuite en vidant SETUP_TOKEN.
+        """
+        if not Config.SETUP_TOKEN or token != Config.SETUP_TOKEN:
+            abort(404)
+
+        from seed import seed_articles, seed_team, seed_programs, seed_resources
+        from generator import build_site
+        lines = []
+        try:
+            db.create_all()
+            lines.append("Tables créées / vérifiées.")
+            lines.append(f"Articles ajoutés : {seed_articles()}")
+            lines.append(f"Membres ajoutés : {seed_team()}")
+            lines.append(f"Programmes ajoutés : {seed_programs()}")
+            lines.append(f"Ressources ajoutées : {seed_resources()}")
+
+            if Config.ADMIN_EMAIL and Config.ADMIN_PASSWORD:
+                user = User.query.filter_by(email=Config.ADMIN_EMAIL).first()
+                if user is None:
+                    user = User(email=Config.ADMIN_EMAIL, role="admin")
+                    user.set_password(Config.ADMIN_PASSWORD)
+                    db.session.add(user)
+                    db.session.commit()
+                    lines.append(f"Compte admin créé : {Config.ADMIN_EMAIL}")
+                else:
+                    lines.append(f"Compte admin déjà présent : {Config.ADMIN_EMAIL}")
+            else:
+                lines.append("ADMIN_EMAIL / ADMIN_PASSWORD non renseignés : aucun compte créé.")
+
+            written = build_site()
+            lines.append(f"Site généré : {len(written)} page(s) dans {Config.OUTPUT_DIR}")
+            ok = True
+        except Exception as exc:  # noqa: BLE001 — on affiche l'erreur (pas de terminal)
+            db.session.rollback()
+            lines.append(f"ERREUR : {exc!r}")
+            ok = False
+
+        body = "".join(f"<li>{escape(l)}</li>" for l in lines)
+        note = ("<p style='color:#3F4A18'><strong>Installation terminée.</strong> "
+                "Pour sécuriser, videz <code>SETUP_TOKEN</code> dans le .env puis redémarrez l'app. "
+                "<a href='/admin'>Aller à l'administration →</a></p>") if ok else \
+               ("<p style='color:#8E1F1A'><strong>Échec.</strong> Corrigez le problème ci-dessus "
+                "(souvent : DATABASE_URL, TEMPLATE_DIR ou OUTPUT_DIR dans le .env) puis rechargez.</p>")
+        return (f"<!doctype html><meta charset='utf-8'><title>Installation AGI CMS</title>"
+                f"<div style=\"font-family:system-ui;max-width:680px;margin:48px auto;padding:0 20px;"
+                f"color:#181612;line-height:1.6\"><h1 style='font-size:1.6rem'>Installation AGI CMS</h1>"
+                f"<ul>{body}</ul>{note}</div>"), (200 if ok else 500)
 
     _register_cli(app)
     return app
