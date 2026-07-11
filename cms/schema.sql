@@ -1,10 +1,40 @@
 -- Schema MySQL de reference (genere depuis models.py).
--- En pratique, ? flask --app app init-db ? cree ces tables automatiquement via
--- SQLAlchemy (compatible MySQL). Ce fichier sert de reference / creation manuelle
--- dans phpMyAdmin. Encodage utf8mb4 pour accents et caracteres speciaux.
+-- 'flask --app app init-db' cree ces tables automatiquement via SQLAlchemy.
+-- Encodage utf8mb4 pour accents et caracteres speciaux.
 
 SET NAMES utf8mb4;
 
+
+CREATE TABLE IF NOT EXISTS applications (
+	id INTEGER NOT NULL AUTO_INCREMENT, 
+	created_at DATETIME, 
+	status VARCHAR(20) NOT NULL, 
+	lang VARCHAR(2), 
+	nom VARCHAR(160), 
+	prenom VARCHAR(160), 
+	email VARCHAR(190), 
+	telephone VARCHAR(60), 
+	date_naissance VARCHAR(40), 
+	genre VARCHAR(40), 
+	nationalite VARCHAR(120), 
+	pays_residence VARCHAR(120), 
+	ville VARCHAR(120), 
+	tranche_age VARCHAR(40), 
+	profession VARCHAR(200), 
+	organisation VARCHAR(200), 
+	langues VARCHAR(200), 
+	statut VARCHAR(400), 
+	domaines VARCHAR(400), 
+	motivation TEXT, 
+	experience TEXT, 
+	contribution TEXT, 
+	data_json TEXT, 
+	cv_file VARCHAR(300), 
+	lettre_file VARCHAR(300), 
+	identite_file VARCHAR(300), 
+	projet_file VARCHAR(300), 
+	PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS articles (
 	id INTEGER NOT NULL AUTO_INCREMENT, 

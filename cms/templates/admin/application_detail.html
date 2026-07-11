@@ -1,0 +1,104 @@
+{% extends "admin/base.html" %}
+{% block title %}Candidature{% endblock %}
+
+{% macro row(label, value) -%}
+{% if value %}<div class="col-md-6"><div class="text-secondary small">{{ label }}</div><div>{{ value }}</div></div>{% endif %}
+{%- endmacro %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <div class="page-eyebrow">Candidature reçue le {{ a.created_at.strftime('%d/%m/%Y à %H:%M') }} UTC</div>
+    <h1 class="mb-0">{{ a.full_name() }}</h1>
+  </div>
+  <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('admin.application_list') }}">← Retour</a>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+        <h6 class="lang-col mb-3">Identité &amp; contact</h6>
+        <div class="row g-3">
+          {{ row('Prénom', a.prenom) }}{{ row('Nom', a.nom) }}
+          {{ row('E-mail', a.email) }}{{ row('Téléphone', a.telephone) }}
+          {{ row('Date de naissance', a.date_naissance) }}{{ row('Genre', a.genre) }}
+          {{ row('Nationalité', a.nationalite) }}{{ row('Tranche d’âge', a.tranche_age) }}
+          {{ row('Pays de résidence', a.pays_residence) }}{{ row('Ville', a.ville) }}
+          {{ row('Langues', a.langues) }}
+        </div>
+      </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+        <h6 class="lang-col mb-3">Profil</h6>
+        <div class="row g-3">
+          {{ row('Profession', a.profession) }}{{ row('Organisation', a.organisation) }}
+          {{ row('Statut', a.statut) }}{{ row('Domaines d’intérêt', a.domaines) }}
+        </div>
+      </div>
+    </div>
+
+    {% if a.motivation or a.experience or a.contribution %}
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+        <h6 class="lang-col mb-3">Motivation</h6>
+        {% if a.motivation %}<p class="text-secondary small mb-1">Motivation</p><p style="white-space:pre-wrap">{{ a.motivation }}</p>{% endif %}
+        {% if a.experience %}<p class="text-secondary small mb-1 mt-3">Expérience</p><p style="white-space:pre-wrap">{{ a.experience }}</p>{% endif %}
+        {% if a.contribution %}<p class="text-secondary small mb-1 mt-3">Contribution</p><p style="white-space:pre-wrap">{{ a.contribution }}</p>{% endif %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% set shown = ['nom','prenom','email','telephone','date_naissance','genre','nationalite','pays_residence','ville','tranche_age','profession','organisation','langues','statut','domaines','motivation','experience','contribution'] %}
+    {% set rest = extra.items() | rejectattr('0', 'in', shown) | list %}
+    {% if rest %}
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+        <h6 class="lang-col mb-3">Autres réponses</h6>
+        <div class="row g-3">
+          {% for k, v in rest %}{{ row(k, (v | join(' ; ')) if v is iterable and v is not string else v) }}{% endfor %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+        <h6 class="lang-col mb-3">Statut</h6>
+        <form method="post" action="{{ url_for('admin.application_status', app_id=a.id) }}" class="d-flex gap-2">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <select class="form-select" name="status">
+            {% for s in statuses %}
+            <option value="{{ s }}" {{ 'selected' if a.status == s else '' }}>
+              {{ {'new':'Nouvelle','reviewed':'Examinée','shortlisted':'Présélectionnée','rejected':'Écartée'}[s] }}
+            </option>
+            {% endfor %}
+          </select>
+          <button class="btn btn-gold" type="submit">OK</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+        <h6 class="lang-col mb-3">Pièces jointes</h6>
+        {% for label, field, path in a.files() %}
+          <a class="btn btn-outline-secondary btn-sm w-100 mb-2 text-start" href="{{ url_for('admin.application_file', app_id=a.id, field=field) }}">⬇ {{ label }}</a>
+        {% else %}
+          <p class="text-secondary small mb-0">Aucune pièce jointe.</p>
+        {% endfor %}
+      </div>
+    </div>
+
+    <form method="post" action="{{ url_for('admin.application_delete', app_id=a.id) }}"
+          onsubmit="return confirm('Supprimer définitivement cette candidature et ses pièces ?');">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button class="btn btn-outline-danger w-100" type="submit">Supprimer la candidature</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

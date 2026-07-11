@@ -4,6 +4,10 @@
 # Base SQLite locale
 instance/
 
+# Uploads et pièces de candidature (données personnelles — jamais versionnées)
+uploads/
+applications_files/
+
 # Site généré (sortie de build)
 /public/
 ../public/

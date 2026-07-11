@@ -46,6 +46,10 @@ def create_app(config: type = Config) -> Flask:
     app.register_blueprint(admin_bp)
     register_media_route(app)
 
+    # Endpoint public du formulaire de candidature (exempté de CSRF).
+    from applications import register_apply_route
+    register_apply_route(app, csrf)
+
     @app.route("/")
     def home():
         return redirect(url_for("admin.dashboard"))
@@ -63,10 +67,12 @@ def create_app(config: type = Config) -> Flask:
 
         from seed import seed_articles, seed_team, seed_programs, seed_resources
         from generator import build_site
+        from dbtools import sync_schema
         lines = []
         try:
-            db.create_all()
-            lines.append("Tables créées / vérifiées.")
+            created, added = sync_schema()
+            lines.append(f"Tables créées : {', '.join(created) if created else 'aucune (déjà à jour)'}")
+            lines.append(f"Colonnes ajoutées : {', '.join(added) if added else 'aucune (déjà à jour)'}")
             lines.append(f"Articles ajoutés : {seed_articles()}")
             lines.append(f"Membres ajoutés : {seed_team()}")
             lines.append(f"Programmes ajoutés : {seed_programs()}")

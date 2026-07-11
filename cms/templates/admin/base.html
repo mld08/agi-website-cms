@@ -24,6 +24,7 @@
       <a class="nav-link {{ 'active' if ep.startswith('admin.team') else '' }}" href="{{ url_for('admin.team_list') }}">Équipe</a>
       <a class="nav-link {{ 'active' if ep.startswith('admin.program') else '' }}" href="{{ url_for('admin.program_list') }}">Programmes</a>
       <a class="nav-link {{ 'active' if ep.startswith('admin.resource') else '' }}" href="{{ url_for('admin.resource_list') }}">Ressources</a>
+      <a class="nav-link {{ 'active' if ep.startswith('admin.application') else '' }}" href="{{ url_for('admin.application_list') }}">Candidatures</a>
       <a class="nav-link {{ 'active' if ep == 'admin.history' else '' }}" href="{{ url_for('admin.history') }}">Historique</a>
       {% if current_user.role == 'admin' %}<a class="nav-link {{ 'active' if ep.startswith('admin.user') else '' }}" href="{{ url_for('admin.user_list') }}">Comptes</a>{% endif %}
       <a class="nav-link" href="/admin/preview/fr/index.html" target="_blank" rel="noopener">Voir le site ↗</a>

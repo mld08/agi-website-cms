@@ -8,18 +8,21 @@ Interface en français pour une équipe non-technique :
   - bouton « Générer le site » qui régénère le HTML statique.
 """
 import re
+import csv
+import io
+import json
 import unicodedata
 from functools import wraps
 from datetime import date, datetime
 from pathlib import Path
 
 from flask import (Blueprint, render_template, request, redirect, url_for,
-                   flash, jsonify, send_from_directory, abort, current_app)
+                   flash, jsonify, send_from_directory, abort, current_app, Response)
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.utils import secure_filename
 
 from config import Config
-from models import db, Article, User, TeamMember, Program, Resource, PublishLog
+from models import db, Article, User, TeamMember, Program, Resource, PublishLog, Application
 from generator import build_site
 
 admin = Blueprint("admin", __name__, url_prefix="/admin")
@@ -289,6 +292,102 @@ def resource_delete(resource_id):
     db.session.commit()
     flash("Ressource supprimée.", "ok")
     return redirect(url_for("admin.resource_list"))
+
+
+# --------------------------------------------------------------------------- #
+#  Candidatures (formulaire public)
+# --------------------------------------------------------------------------- #
+_APP_STATUSES = ("new", "reviewed", "shortlisted", "rejected")
+
+
+@admin.route("/applications")
+@login_required
+def application_list():
+    q = Application.query.order_by(Application.created_at.desc())
+    status = request.args.get("status", "")
+    if status in _APP_STATUSES:
+        q = q.filter_by(status=status)
+    applications = q.all()
+    counts = {s: Application.query.filter_by(status=s).count() for s in _APP_STATUSES}
+    counts["all"] = Application.query.count()
+    return render_template("admin/application_list.html",
+                           applications=applications, counts=counts, current_status=status)
+
+
+@admin.route("/applications/<int:app_id>")
+@login_required
+def application_detail(app_id):
+    application = Application.query.get_or_404(app_id)
+    try:
+        extra = json.loads(application.data_json or "{}")
+    except ValueError:
+        extra = {}
+    return render_template("admin/application_detail.html",
+                           a=application, extra=extra, statuses=_APP_STATUSES)
+
+
+@admin.route("/applications/<int:app_id>/status", methods=["POST"])
+@login_required
+def application_status(app_id):
+    application = Application.query.get_or_404(app_id)
+    new_status = request.form.get("status", "")
+    if new_status in _APP_STATUSES:
+        application.status = new_status
+        db.session.commit()
+        flash("Statut mis à jour.", "ok")
+    return redirect(url_for("admin.application_detail", app_id=app_id))
+
+
+@admin.route("/applications/<int:app_id>/file/<field>")
+@login_required
+def application_file(app_id, field):
+    application = Application.query.get_or_404(app_id)
+    if field not in ("cv_file", "lettre_file", "identite_file", "projet_file"):
+        abort(404)
+    rel = getattr(application, field, "")
+    if not rel:
+        abort(404)
+    return send_from_directory(Config.APPLICATIONS_DIR, rel, as_attachment=True)
+
+
+@admin.route("/applications/<int:app_id>/delete", methods=["POST"])
+@login_required
+def application_delete(app_id):
+    application = Application.query.get_or_404(app_id)
+    # Supprime aussi les pièces jointes du disque.
+    folder = Config.APPLICATIONS_DIR / str(application.id)
+    if folder.exists():
+        for f in folder.iterdir():
+            try:
+                f.unlink()
+            except OSError:
+                pass
+        try:
+            folder.rmdir()
+        except OSError:
+            pass
+    db.session.delete(application)
+    db.session.commit()
+    flash("Candidature supprimée.", "ok")
+    return redirect(url_for("admin.application_list"))
+
+
+@admin.route("/applications.csv")
+@login_required
+def application_export():
+    rows = Application.query.order_by(Application.created_at.desc()).all()
+    cols = ["id", "created_at", "status", "lang", "prenom", "nom", "email", "telephone",
+            "date_naissance", "genre", "nationalite", "pays_residence", "ville",
+            "tranche_age", "profession", "organisation", "langues", "statut", "domaines"]
+    buf = io.StringIO()
+    buf.write("﻿")  # BOM pour Excel (accents)
+    writer = csv.writer(buf, delimiter=";")
+    writer.writerow(cols)
+    for r in rows:
+        writer.writerow([getattr(r, c) if c != "created_at" else r.created_at.strftime("%Y-%m-%d %H:%M")
+                         for c in cols])
+    return Response(buf.getvalue(), mimetype="text/csv",
+                    headers={"Content-Disposition": "attachment; filename=candidatures.csv"})
 
 
 # --------------------------------------------------------------------------- #

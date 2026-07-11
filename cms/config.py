@@ -48,4 +48,17 @@ class Config:
     UPLOAD_DIR = BASE_DIR / "uploads"
     ALLOWED_IMAGE_EXT = {".webp", ".jpg", ".jpeg", ".png", ".gif", ".svg"}
     ALLOWED_DOC_EXT = {".pdf"}
-    MAX_CONTENT_LENGTH = 25 * 1024 * 1024   # 25 Mo max par fichier
+    MAX_CONTENT_LENGTH = 25 * 1024 * 1024   # 25 Mo max par requête
+
+    # Candidatures (formulaire public). Pièces stockées en PRIVÉ, hors public_html.
+    APPLICATIONS_DIR = BASE_DIR / "applications_files"
+    ALLOWED_APP_EXT = {".pdf", ".doc", ".docx", ".jpg", ".jpeg", ".png"}
+    MAX_APP_FILE_SIZE = 10 * 1024 * 1024    # 10 Mo max par pièce jointe
+
+    # Notification e-mail des nouvelles candidatures (SMTP cPanel).
+    SMTP_HOST = os.environ.get("SMTP_HOST", "").strip()
+    SMTP_PORT = int(os.environ.get("SMTP_PORT", "465") or 465)
+    SMTP_USER = os.environ.get("SMTP_USER", "").strip()
+    SMTP_PASSWORD = os.environ.get("SMTP_PASSWORD", "")
+    SMTP_FROM = os.environ.get("SMTP_FROM", "").strip() or os.environ.get("SMTP_USER", "").strip()
+    APPLICATION_NOTIFY_EMAIL = os.environ.get("APPLICATION_NOTIFY_EMAIL", "").strip()

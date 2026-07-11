@@ -215,6 +215,53 @@ class Resource(db.Model):
         }
 
 
+class Application(db.Model):
+    """Une candidature soumise depuis le formulaire public (Coastal Futures)."""
+    __tablename__ = "applications"
+    id = db.Column(db.Integer, primary_key=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    status = db.Column(db.String(20), nullable=False, default="new")  # new | reviewed | shortlisted | rejected
+    lang = db.Column(db.String(2), default="fr")
+
+    # Champs principaux (recherche / affichage rapide).
+    nom = db.Column(db.String(160), default="")
+    prenom = db.Column(db.String(160), default="")
+    email = db.Column(db.String(190), default="")
+    telephone = db.Column(db.String(60), default="")
+    date_naissance = db.Column(db.String(40), default="")
+    genre = db.Column(db.String(40), default="")
+    nationalite = db.Column(db.String(120), default="")
+    pays_residence = db.Column(db.String(120), default="")
+    ville = db.Column(db.String(120), default="")
+    tranche_age = db.Column(db.String(40), default="")
+    profession = db.Column(db.String(200), default="")
+    organisation = db.Column(db.String(200), default="")
+    langues = db.Column(db.String(200), default="")
+    statut = db.Column(db.String(400), default="")      # cases multiples, jointes par « ; »
+    domaines = db.Column(db.String(400), default="")    # cases multiples, jointes par « ; »
+    motivation = db.Column(db.Text, default="")
+    experience = db.Column(db.Text, default="")
+    contribution = db.Column(db.Text, default="")
+
+    # Toutes les réponses brutes (robuste aux évolutions du formulaire).
+    data_json = db.Column(db.Text, default="")
+
+    # Pièces jointes : chemin relatif sous APPLICATIONS_DIR (privé, hors public_html).
+    cv_file = db.Column(db.String(300), default="")
+    lettre_file = db.Column(db.String(300), default="")
+    identite_file = db.Column(db.String(300), default="")
+    projet_file = db.Column(db.String(300), default="")
+
+    def full_name(self):
+        return f"{self.prenom} {self.nom}".strip() or self.email or f"Candidature #{self.id}"
+
+    def files(self):
+        """Renvoie [(label, champ, chemin), …] pour les pièces présentes."""
+        mapping = [("CV", "cv_file"), ("Lettre de motivation", "lettre_file"),
+                   ("Pièce d'identité", "identite_file"), ("Projet", "projet_file")]
+        return [(label, field, getattr(self, field)) for label, field in mapping if getattr(self, field)]
+
+
 class PublishLog(db.Model):
     """Une entrée de l'historique : chaque génération du site (« Publier »)."""
     __tablename__ = "publish_log"
