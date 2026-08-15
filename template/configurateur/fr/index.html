@@ -1,0 +1,689 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#14110d">
+<title>Configurateur · Africa Governance Institute</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="icon" type="image/png" sizes="256x256" href="assets/favicon-256.png">
+<link rel="apple-touch-icon" href="assets/favicon-256.png">
+<link rel="preload" as="font" type="font/woff2" href="assets/fonts/poppins-400-latin.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="assets/fonts/poppins-600-latin.woff2" crossorigin>
+<link rel="stylesheet" href="styles.css">
+<style>
+body{margin:0;font-family:var(--sans);font-size:15px;line-height:1.55;color:var(--ink-2);background:var(--paper)}
+
+/* ---- gate ---- */
+.gate{position:fixed;inset:0;z-index:500;display:flex;align-items:center;justify-content:center;padding:24px;background:radial-gradient(circle at 1px 1px,rgba(232,185,54,.16) 1px,transparent 0) 0 0/38px 38px,var(--agi-olive-deep);transition:opacity .3s ease}
+.gate.gate-hide{opacity:0;pointer-events:none}
+.gate-arcs{position:absolute;top:-90px;right:-70px;width:min(52vw,540px);opacity:.32;z-index:0}
+.gate-card{position:relative;z-index:1;width:100%;max-width:440px;background:var(--paper);border-radius:22px;padding:44px 38px;box-shadow:0 40px 80px -30px rgba(0,0,0,.5);text-align:center;display:flex;flex-direction:column;align-items:center}
+.gate-card .eyebrow{margin-bottom:12px}
+.gate-card h1{font-family:var(--serif);font-weight:500;font-size:28px;color:var(--ink);margin:0 0 12px;letter-spacing:-.01em}
+.gate-card p{font-size:14.5px;line-height:1.55;color:var(--ink-2);margin:0 0 22px;max-width:34ch}
+.gate-card input{width:100%;font-family:var(--sans);font-size:16px;color:var(--ink);background:var(--paper);border:1.5px solid var(--line-2);border-radius:10px;padding:13px 16px;outline:none;text-align:center;letter-spacing:.02em}
+.gate-card input:focus{border-color:var(--agi-red)}
+.gate-card .btn{margin-top:14px;width:100%;justify-content:center}
+.gate-err{min-height:1.2em;font-size:13px;color:var(--agi-red);font-weight:600;margin:12px 0 0}
+.gate-card small{display:block;margin-top:16px;font-size:12px;color:var(--ink-3)}
+
+/* ---- en-tête ---- */
+.cfg-head{background:var(--paper);border-bottom:1px solid var(--line)}
+.cfg-head-in{display:flex;align-items:center;justify-content:space-between;gap:20px;padding-top:16px;padding-bottom:16px;flex-wrap:wrap}
+.cfg-brand{flex-shrink:0}
+.cfg-brand img{height:40px;width:auto;display:block}
+.cfg-lock{font-family:var(--sans);font-size:12.5px;color:var(--ink-3);border:1px solid var(--line);border-radius:999px;padding:8px 16px;transition:color .2s,border-color .2s;flex-shrink:0}
+.cfg-lock:hover{color:var(--agi-red);border-color:var(--agi-red)}
+
+/* ---- barre épinglée ---- */
+.bar{position:sticky;top:0;z-index:60;background:var(--agi-olive-deep);border-bottom:1px solid rgba(255,255,255,.1);box-shadow:0 6px 24px rgba(0,0,0,.18)}
+.barin{display:flex;gap:20px;align-items:flex-end;flex-wrap:wrap;padding-top:14px;padding-bottom:14px}
+.bsel{flex:1;min-width:210px}
+.bsel label{display:block;font-family:var(--sans);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:rgba(248,242,226,.6);font-weight:600;margin-bottom:6px}
+.bsel select{width:100%;font-family:var(--sans);font-size:14px;color:#fff;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);border-radius:8px;padding:10px 12px;outline:none;-webkit-appearance:none;appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%23C9BE9E' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+.bsel select:focus{border-color:var(--agi-yellow)}
+.bsel select option{background:var(--agi-olive-deep);color:#fff}
+.bprix{display:flex;gap:30px}
+.bprix div{text-align:right}
+.bprix span{display:block;font-family:var(--sans);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:rgba(248,242,226,.6);font-weight:600}
+.bprix strong{font-family:var(--sans);font-weight:700;font-size:24px;color:var(--agi-yellow);letter-spacing:-.02em;line-height:1.2;font-variant-numeric:tabular-nums}
+.bprix small{font-size:11px;font-weight:500;color:rgba(248,242,226,.55)}
+
+/* ---- corps ---- */
+.cfg-wrap{display:flex;gap:28px;align-items:flex-start;padding:26px 0 60px}
+.cfg-main{flex:1;min-width:0}
+.cfg-aside{width:340px;flex-shrink:0;position:sticky;top:112px}
+
+/* ---- bandeau ---- */
+.cfg-hero{position:relative;overflow:hidden;background:radial-gradient(circle at 1px 1px,rgba(232,185,54,.13) 1px,transparent 0) 0 0/38px 38px,var(--agi-olive-deep)}
+.hero-arcs2{position:absolute;top:-70px;right:-50px;width:min(38vw,460px);opacity:.35}
+.cfg-hero-in{position:relative;z-index:1;padding-top:52px;padding-bottom:56px}
+.cfg-hero h1{font-family:var(--serif);font-weight:500;font-size:clamp(32px,4vw,52px);line-height:1.05;letter-spacing:-.012em;color:#fff;margin:16px 0 14px;max-width:21ch;text-wrap:balance}
+.cfg-hero p{margin:0;font-size:15.5px;line-height:1.6;color:rgba(248,242,226,.78);max-width:64ch}
+
+.intro{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:20px 24px;margin-bottom:16px}
+.note{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:14px 16px;font-size:13.5px;color:var(--ink-2)}
+.note b{color:var(--ink)}
+.exp{margin-top:12px}
+.exp>summary{font-size:13.5px;font-weight:600}
+.exp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px 20px;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:18px;margin-top:10px}
+.exp-lede{grid-column:1/-1;margin:0;font-size:13px;color:var(--ink)}
+.exp-grid h3{font-family:var(--sans);font-weight:700;font-size:13px;color:var(--ink);margin:0 0 6px;display:flex;gap:8px;align-items:baseline}
+.exp-grid h3 span{font-family:var(--sans);font-weight:700;color:var(--agi-red);font-size:12px}
+.exp-grid>div>p{margin:0;font-size:12.5px;line-height:1.55;color:var(--ink-2)}
+.exp-foot{grid-column:1/-1;border-top:1px solid var(--line);padding-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:16px 20px}
+.exp-foot p{margin:0;font-size:12.5px;line-height:1.55;color:var(--ink-2)}
+.exp-foot b,.exp-lede b{color:var(--ink)}
+
+section.blk{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:24px 28px 8px;margin-bottom:16px;scroll-margin-top:108px}
+.hd2{display:flex;flex-direction:column;gap:7px;margin-bottom:6px}
+.letter{font-family:var(--sans);font-weight:600;font-size:12px;color:var(--agi-red);letter-spacing:.1em;font-variant-numeric:tabular-nums}
+.letter:before{content:"0"}
+section.blk h2{font-family:var(--serif);font-weight:500;font-size:27px;letter-spacing:-.01em;margin:0;color:var(--ink);line-height:1.05}
+.sub{font-size:13px;color:var(--ink-3);margin:0 0 4px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+section.blk-final{background:var(--agi-olive-deep);border-color:var(--agi-olive-deep);padding-bottom:26px;position:relative;overflow:hidden}
+.blk-final .letter{color:var(--agi-yellow)}
+section.blk-final h2{color:#fff}
+.blk-final .sub{color:rgba(248,242,226,.6);border-color:rgba(255,255,255,.16)}
+.fin-arcs{position:absolute;bottom:-130px;right:-90px;width:440px;opacity:.16}
+
+.f{display:flex;gap:20px;align-items:flex-start;padding:14px 0;border-bottom:1px solid var(--cream-2)}
+section.blk .f:last-of-type{border-bottom:0}
+.f .lft{flex:1;min-width:0}
+.f .q{font-family:var(--sans);font-weight:600;font-size:14.5px;color:var(--ink)}
+.f .h{font-size:12.5px;color:var(--ink-3);line-height:1.45;margin-top:3px}
+.f .ctl{width:230px;flex-shrink:0}
+.f.fx .ctl{text-align:right;padding-top:8px;font-family:var(--sans);font-weight:600;font-size:13px;color:var(--agi-olive)}
+select,input[type=number]{width:100%;font-family:var(--sans);font-size:14px;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:10px 12px;outline:none;-webkit-appearance:none;appearance:none}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%236A6354' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;cursor:pointer}
+select:focus,input:focus{border-color:var(--agi-red);box-shadow:0 0 0 3px rgba(178,47,40,.10)}
+select.off{border-color:rgba(232,185,54,.55);background-color:rgba(232,185,54,.08)}
+.delta{display:inline-block;font-size:11.5px;font-weight:600;color:var(--agi-orange);margin-top:6px;font-variant-numeric:tabular-nums}
+.delta.neg{color:var(--agi-olive)}
+
+.why{margin-top:6px}
+.why summary{cursor:pointer;font-size:12px;color:var(--agi-red);font-weight:600;list-style:none;display:inline-block}
+.why summary::-webkit-details-marker{display:none}
+.why summary:before{content:"▸ ";font-size:10px}
+.why[open] summary:before{content:"▾ "}
+.why .body{font-size:12.5px;color:var(--ink-2);line-height:1.5;background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin-top:6px}
+.why .body b{color:var(--ink)}
+.alert{background:rgba(221,135,40,.08);border-left:3px solid var(--agi-orange);padding:10px 12px;margin:8px 0 0;border-radius:0 8px 8px 0;font-size:12.5px;line-height:1.5;color:var(--ink-2)}
+
+.reca{display:flex;gap:28px}
+.reca>div{flex:1}
+.reca h4{font-family:var(--sans);font-weight:700;font-size:11px;letter-spacing:.1em;text-transform:uppercase;margin:0 0 10px;color:var(--ink-3)}
+.reca ul{margin:0;padding-left:0;list-style:none}
+.reca li{font-size:13px;margin-bottom:7px;color:var(--ink-2);padding-left:20px;position:relative}
+.reca li b{color:var(--ink);font-weight:600}
+.reca>div:first-child li:before{content:"✓";position:absolute;left:0;color:var(--agi-olive);font-weight:700}
+.reca .no li{color:#A8A49D}
+.reca .no li:before{content:"–";position:absolute;left:0;color:#C9BE9E}
+.blk-final .reca{position:relative;z-index:1}
+.blk-final .reca h4{color:rgba(248,242,226,.55)}
+.blk-final .reca li{color:rgba(248,242,226,.85)}
+.blk-final .reca li b{color:#fff}
+.blk-final .reca>div:first-child li:before{color:var(--agi-yellow)}
+.blk-final .reca .no li{color:rgba(248,242,226,.45)}
+.blk-final .reca .no li:before{color:rgba(248,242,226,.3)}
+
+/* ---- panneau ---- */
+.panel{background:var(--agi-olive-deep);color:rgba(248,242,226,.82);border-radius:18px;overflow:hidden}
+.grp{padding:16px 22px;border-bottom:1px solid rgba(255,255,255,.12)}
+.grp:last-child{border-bottom:0}
+.gt{font-family:var(--sans);font-weight:700;font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:rgba(248,242,226,.55);margin-bottom:10px}
+.som{display:flex;flex-direction:column}
+.som a{display:flex;gap:10px;align-items:baseline;font-size:12.5px;color:rgba(248,242,226,.72);padding:4px 0;transition:color .2s}
+.som a span{font-family:var(--sans);font-size:10.5px;color:rgba(248,242,226,.4);letter-spacing:.04em}
+.som a:hover{color:#fff}
+.som a.on,.som a.on span{color:var(--agi-yellow)}
+.li{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;padding:3px 0;line-height:1.4}
+.li .l{color:rgba(248,242,226,.72)}
+.li .v{font-family:var(--sans);font-variant-numeric:tabular-nums;color:#fff;font-weight:500;white-space:nowrap}
+.li.tot{border-top:1px solid rgba(255,255,255,.2);margin-top:8px;padding-top:8px;font-family:var(--sans);font-weight:700;font-size:13.5px}
+.li.tot .l,.li.tot .v{color:var(--agi-yellow)}
+.li.mut .l,.li.mut .v{color:rgba(248,242,226,.5)}
+.pacts{padding:16px 22px;background:rgba(0,0,0,.15);display:flex;gap:8px}
+.pacts .btn{flex:1;justify-content:center;padding:11px;font-size:12.5px}
+#admin{display:none}
+body.adm #admin{display:block}
+.pr{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:3px 0}
+.pr label{font-size:11px;color:rgba(248,242,226,.65);flex:1;line-height:1.3}
+.pr input{width:90px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);color:#fff;font-size:11.5px;padding:5px 7px;border-radius:5px;text-align:right;font-family:var(--sans)}
+
+/* ---- pied ---- */
+.cfg-foot{padding:32px 0 50px}
+.footer-stripe{display:flex;height:4px;border-radius:2px;overflow:hidden;margin-bottom:18px}
+.footer-stripe span{flex:1}
+.footer-stripe span:nth-child(1){background:var(--agi-olive)}
+.footer-stripe span:nth-child(2){background:var(--agi-orange)}
+.footer-stripe span:nth-child(3){background:var(--agi-yellow)}
+.footer-stripe span:nth-child(4){background:var(--agi-red)}
+.cfg-foot p{margin:0;font-size:12px;color:var(--ink-3);line-height:1.5}
+
+/* ---- devis imprimé ---- */
+.print-head{display:none}
+.ph-amounts{display:flex;gap:44px;align-items:flex-end;border-bottom:2px solid var(--ink);padding-bottom:14px}
+.ph-amounts span{display:block;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);font-weight:600;margin-bottom:2px}
+.ph-amounts strong{font-family:var(--sans);font-weight:700;font-size:26px;color:var(--ink);letter-spacing:-.02em}
+.ph-amounts small{font-size:12px;color:var(--ink-3)}
+.ph-amounts em{font-style:normal;font-size:14px;font-weight:600;color:var(--ink)}
+.ph-bill{margin-left:auto;text-align:right}
+.ph-send{margin:14px 0 0;font-size:13px;color:var(--ink);border:1.5px solid var(--ink);border-radius:8px;padding:10px 14px}
+
+@media(max-width:1080px){
+ .cfg-wrap{flex-direction:column;padding:18px 0 40px}
+ .cfg-aside{width:100%;position:static}
+ .f{flex-direction:column;gap:8px}.f .ctl{width:100%}
+ .f.fx .ctl{text-align:left;padding-top:0}
+ .barin{gap:14px}
+ .bsel{min-width:100%}
+ .bprix{width:100%;justify-content:space-between}
+ .bprix div{text-align:left}
+ .bprix strong{font-size:22px}
+ .reca{flex-direction:column;gap:16px}
+ section.blk{padding:22px 20px 6px}
+ .cfg-hero-in{padding-top:36px;padding-bottom:40px}
+ .exp-grid{grid-template-columns:1fr}
+ .exp-foot{grid-template-columns:1fr}
+ .grp-som{display:none}
+}
+@media print{
+#gate,.cfg-head,.bar,.why,.pacts,.hero-arcs2,.fin-arcs,.intro,section.blk:not(.blk-final),.grp-som,.footer-stripe,.cfg-hero p{display:none}
+#admin{display:none!important}
+body{background:#fff}
+.cfg-hero{background:#fff}
+.cfg-hero-in{padding-top:8px;padding-bottom:6px}
+.cfg-hero .eyebrow{color:var(--agi-red)}
+.cfg-hero h1{color:var(--ink);font-size:30px;margin:10px 0 0;max-width:none}
+.print-head{display:block;padding-top:6px}
+.cfg-wrap{display:flex;flex-direction:column;gap:14px;padding:12px 0 0}
+.cfg-main{order:2}
+.cfg-aside{order:1;width:auto;position:static}
+.panel{background:#fff;color:var(--ink-2);border:1px solid var(--line-2);border-radius:10px}
+.grp{border-color:var(--line)}
+.gt{color:var(--ink-3)}
+.li .l{color:var(--ink-2)}
+.li .v{color:var(--ink)}
+.li.tot{border-color:var(--line-2)}
+.li.tot .l,.li.tot .v{color:var(--ink)}
+.li.mut .l,.li.mut .v{color:var(--ink-3)}
+section.blk-final{background:#fff;border-color:var(--line-2)}
+section.blk-final h2{color:var(--ink)}
+.blk-final .letter{color:var(--agi-red)}
+.blk-final .sub{color:var(--ink-3);border-color:var(--line)}
+.blk-final .reca h4{color:var(--ink-3)}
+.blk-final .reca li{color:var(--ink-2)}
+.blk-final .reca li b{color:var(--ink)}
+.blk-final .reca>div:first-child li:before{color:var(--agi-olive)}
+.blk-final .reca .no li{color:var(--ink-3)}
+.blk-final .reca .no li:before{color:var(--line-2)}
+}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Aller au contenu principal</a>
+
+<div id="gate" class="gate">
+  <div class="gate-arcs arc-orbit" aria-hidden="true"><span class="a-g"></span><span class="a-r"></span><span class="a-o"></span><span class="a-y"></span></div>
+  <form class="gate-card" id="gateForm" autocomplete="off">
+    <span class="eyebrow">Espace privé</span>
+    <h1>Accès au configurateur</h1>
+    <p>Saisissez le code transmis par l'Africa Governance Institute pour accéder à votre configurateur du système d'information.</p>
+    <label class="sr-only" for="gateCode">Code d'accès</label>
+    <input id="gateCode" name="code" type="text" autocomplete="off" spellcheck="false" placeholder="Code d'accès" required>
+    <button type="submit" class="btn btn-primary">Accéder</button>
+    <p class="gate-err" id="gateErr" role="alert" aria-live="polite"></p>
+    <small>L'accès reste enregistré sur cet appareil.</small>
+  </form>
+</div>
+
+<div id="app" hidden>
+
+<header class="cfg-head"><div class="wrap cfg-head-in">
+  <div class="brand cfg-brand"><img src="assets/logo.png" alt="Africa Governance Institute" width="1733" height="970"></div>
+  <button type="button" class="cfg-lock" id="lockBtn">Verrouiller l'accès</button>
+</div></header>
+
+<div class="bar"><div class="wrap barin">
+  <div class="bsel"><label>Règlement des licences</label>
+    <select id="sel_bill" onchange="V.bill=this.value;go()">
+      <option value="a">À l'année, réglées d'avance</option>
+      <option value="m">Chaque mois</option>
+    </select></div>
+  <div class="bsel"><label>Point de départ</label>
+    <select id="sel_scen" onchange="V.scen=this.value;applyScen();go()">
+      <option value="base">Base, nos recommandations</option>
+      <option value="low">Low-Cost, le strict nécessaire</option>
+      <option value="all">Extra Coverage, couverture maximale</option>
+      <option value="custom">Personnalisé</option>
+    </select></div>
+  <div class="bprix">
+    <div><span>À l'engagement</span><strong id="vS">0</strong><small> FCFA</small></div>
+    <div><span>Chaque mois</span><strong id="vM">0</strong><small> FCFA</small></div>
+  </div>
+</div></div>
+
+<section class="cfg-hero">
+  <div class="hero-arcs2 arc-orbit" aria-hidden="true"><span class="a-g"></span><span class="a-r"></span><span class="a-o"></span><span class="a-y"></span></div>
+  <div class="wrap cfg-hero-in">
+    <span class="eyebrow on-dark">Configurateur · Système d'information</span>
+    <h1>Composez le dispositif dont l'institut a besoin.</h1>
+    <p>Choisissez un point de départ en haut de page, puis modifiez librement chaque ligne. Les deux montants se recalculent à chaque changement, et l'effet de chaque option est affiché sous celle-ci.</p>
+  </div>
+</section>
+
+<main id="main" tabindex="-1">
+<div class="wrap print-head">
+  <div class="ph-amounts">
+    <div><span>À l'engagement</span><strong id="pvS">0</strong><small> FCFA</small></div>
+    <div><span>Chaque mois</span><strong id="pvM">0</strong><small> FCFA</small></div>
+    <div class="ph-bill"><span>Règlement des licences</span><em id="pvBill">À l'année, réglées d'avance</em></div>
+  </div>
+  <p class="ph-send"><b>Transmettre à Studio Karda à l'adresse studiokarda@gmail.com</b></p>
+</div>
+<div class="wrap cfg-wrap">
+  <div class="cfg-main">
+    <div class="intro">
+      <div class="note"><b>Vos acquisitions antérieures restent en place.</b> Les noms de domaine et les hébergements souscrits chez GoDaddy demeurent sous notre gestion et restent valides quel que soit le forfait retenu. Ils ne sont pas refacturés ici.</div>
+      <details class="why exp"><summary>Comprendre comment les prix sont répartis</summary>
+      <div class="exp-grid">
+        <p class="exp-lede"><b>Trois natures de dépense, jamais mélangées.</b></p>
+        <div><h3><span>1</span>La mise en place</h3><p>Réglée une seule fois. Elle couvre le travail de reprise : transfert de la messagerie, sécurisation, configuration des postes, organisation des documents, documentation et formation. Une fois faite, elle n'est jamais refacturée. Ajouter un module de sécurité en cours de route coûte plus cher que de le poser maintenant, parce qu'il faut alors défaire et refaire.</p></div>
+        <div><h3><span>2</span>Le forfait mensuel</h3><p>Il paie une équipe mobilisée, pas un volume d'incidents. C'est pourquoi il bouge peu d'un scénario à l'autre : que vous ayez une panne ou dix dans le mois, les mêmes personnes restent disponibles. Ce qui le fait varier, ce sont deux choses seulement : l'étendue de la disponibilité que vous demandez, et l'enveloppe de développement que vous réservez. L'assistance aux utilisateurs, l'administration et la surveillance ne sont jamais décomptées.</p></div>
+        <div><h3><span>3</span>Les licences des éditeurs</h3><p>Microsoft, le coffre-fort, la sauvegarde, Claude. Elles sont souscrites à votre nom, avancées par nos soins et refacturées au coût réel majoré de 10 % de frais de gestion et d'avance. Nous ne prenons aucune marge sur le logiciel lui-même. Ces montants suivent le nombre de personnes et le niveau de protection retenu, et eux seuls expliquent l'essentiel de l'écart entre les scénarios.</p></div>
+        <div class="exp-foot">
+          <p><b>Deux rythmes de paiement.</b> Les licences peuvent être réglées à l'année, ce qui alourdit l'engagement initial et allège le mensuel, ou chaque mois, ce qui fait l'inverse. La durée d'engagement et le tarif restent identiques : sur douze mois, vous payez la même chose. Seule la trésorerie change.</p>
+          <p><b>Ce qui n'est jamais dans ces montants.</b> Le matériel, les abonnements internet, et la construction d'une nouvelle plateforme, qui se traitent à part et au prix coûtant pour le matériel.</p>
+        </div>
+      </div></details>
+    </div>
+    <div id="form"></div>
+  </div>
+
+  <aside class="cfg-aside"><div class="panel">
+    <div class="grp grp-som"><div class="gt">Sommaire</div><nav class="som" aria-label="Sections du configurateur">
+      <a href="#sec1"><span>01</span>Votre périmètre</a>
+      <a href="#sec2"><span>02</span>Le socle</a>
+      <a href="#sec3"><span>03</span>Sécurité et documents</a>
+      <a href="#sec4"><span>04</span>Le service au quotidien</a>
+      <a href="#sec5"><span>05</span>Claude</a>
+      <a href="#sec6"><span>06</span>Ce que vous obtenez</a>
+    </nav></div>
+    <div class="grp"><div class="gt">Détail à l'engagement</div><div id="dS"></div></div>
+    <div class="grp"><div class="gt">Détail mensuel</div><div id="dM"></div></div>
+    <div id="admin">
+      <div class="grp"><div class="gt">Contrôle interne</div><div id="dCtl"></div></div>
+      <div class="grp"><div class="gt">Paramètres</div><div id="pgrid"></div></div>
+    </div>
+    <div class="pacts">
+      <button class="btn btn-outline" onclick="location.reload()">Rétablir</button>
+      <button class="btn btn-primary" onclick="window.print()">Imprimer</button>
+    </div>
+  </div></aside>
+</div></main>
+
+<div class="wrap cfg-foot">
+  <div class="footer-stripe"><span></span><span></span><span></span><span></span></div>
+  <p>Studio Karda · Dakar. Montants en francs CFA, hors taxes. Les licences sont souscrites au nom de l'institut et avancées par nos soins, majorées de frais de gestion de 10 %. Cette simulation vaut estimation et non devis ferme.</p>
+</div>
+
+</div>
+
+<script>
+const R={
+ socle:{v:400000,l:"Mise en place, socle"},
+ boite:{v:25000,l:"Boîte au-delà de 10"},
+ siteS:{v:60000,l:"Site au-delà de 3"},
+ backupS:{v:90000,l:"Sauvegarde, mise en place"},
+ sens1:{v:60000,l:"Sensibilisation, une session"},
+ sens2:{v:125000,l:"Sensibilisation et tests mensuels"},
+ share:{v:120000,l:"Organisation et conservation des documents"},
+ signS:{v:80000,l:"Signature électronique, paramétrage"},
+ reseau:{v:60000,l:"Cadrage de la connectivité"},
+ iaB:{v:100000,l:"Claude, cadrage initial"},
+ iaS:{v:15000,l:"Claude, par siège"},
+
+ base:{v:350000,l:"Forfait mensuel de base"},
+ cap10:{v:200000,l:"Enveloppe 10 h par semaine"},
+ cap20:{v:300000,l:"Enveloppe 20 h par semaine"},
+ j5:{v:0,l:"Lundi-vendredi au lieu de samedi"},
+ j7:{v:60000,l:"Ajout du dimanche"},
+ hUrg:{v:90000,l:"Urgences hors heures"},
+ int0:{v:0,l:"Aucun passage au bureau"},
+ intM:{v:20000,l:"Passage mensuel au bureau"},
+ intH:{v:110000,l:"Passage hebdomadaire au bureau"},
+ mia:{v:30000,l:"Administration Claude"},
+ user:{v:12000,l:"Personne au-delà de 12"},
+ msite:{v:40000,l:"Site au-delà de 3"},
+ mposte:{v:6000,l:"Ordinateur au-delà de 12"},
+ hSup:{v:20000,l:"Heure au-delà de l'enveloppe"},
+
+ ePrem:{v:19.06,l:"EUR/mois · M365 Business Premium"},
+ eStd:{v:12.13,l:"EUR/mois · M365 Business Standard"},
+ eBas:{v:6.07,l:"EUR/mois · M365 Business Basic"},
+ uPwd:{v:4,l:"USD/mois · Coffre-fort"},
+ uBackT:{v:3,l:"USD/mois · Sauvegarde tierce, par boîte"},
+ uBackMs:{v:0.15,l:"USD/mois · Sauvegarde Microsoft, par Go"},
+ goUser:{v:25,l:"Go protégés par personne"},
+ uIAa:{v:20,l:"USD/mois · Claude, siège annuel"},
+ uIAm:{v:25,l:"USD/mois · Claude, siège mensuel"},
+ eDsa:{v:19,l:"EUR/mois · DocuSign, annuel"},
+ eDsm:{v:25,l:"EUR/mois · DocuSign, mensuel"},
+ markup:{v:10,l:"Frais de gestion, %"},
+ fxe:{v:655.957,l:"FCFA pour 1 EUR"},
+ fxu:{v:575,l:"FCFA pour 1 USD"},
+
+ cCousin:{v:225000,l:"COÛT · cousin"},
+ cClaude:{v:135000,l:"COÛT · Claude Max"},
+ cClaudeAll:{v:50,l:"COÛT · part imputée, %"},
+ cOutils:{v:34000,l:"COÛT · outillage"},
+ cDeplac:{v:15000,l:"COÛT · déplacements"},
+ cHeures:{v:68,l:"COÛT · heures de mise en place"}
+};
+
+const SCEN={
+ base:{plan:"prem",postes:5,cap:"10",jours:"6",heures:"n",inter:"p",backup:"t",sens:"1",share:"1",sign:"0",dsUsers:0,reseau:"0",iaSeats:0,iaAcc:"0"},
+ low:{plan:"std",postes:5,cap:"0",jours:"5",heures:"n",inter:"0",backup:"0",sens:"0",share:"0",sign:"0",dsUsers:0,reseau:"0",iaSeats:0,iaAcc:"0"},
+ all:{plan:"prem",postes:9,cap:"20",jours:"7",heures:"u",inter:"m",backup:"t",sens:"2",share:"1",sign:"1",dsUsers:3,reseau:"1",iaSeats:9,iaAcc:"1"}
+};
+
+const N=(q,h,def,min,max)=>({ty:"num",q,h,def,min,max});
+const D=(q,h,o,def,why,lic)=>({ty:"sel",q,h,o,def,why,lic});
+const F=(q,h,val)=>({ty:"fx",q,h,val});
+
+const G=[
+{id:"1",t:"Votre périmètre",s:"Trois chiffres.",f:{
+ users:F("Personnes disposant d'une adresse professionnelle","Chacune conserve son compte nominatif et sa double vérification.","9 adresses mail"),
+ postes:N("Ordinateurs pris en charge et administrés","Détermine le nombre de licences complètes. Les autres personnes conservent un compte allégé.",5,0,300),
+ sites:N("Sites web à exploiter","Africa YEP, Coastal Futures, site institutionnel de l'IAG.",3,0,30)
+}},
+{id:"2",t:"Le socle",s:"Compris dans tous les cas.",f:{
+ plan:D("Formule Microsoft 365","Les applications sont identiques. Le choix porte sur la protection.",
+  [["prem","Business Premium"],["std","Business Standard"]],"prem",
+  "Avec Premium, nous administrons vos ordinateurs à distance, verrouillons un portable volé, garantissons le chiffrement des disques, bloquons les rançongiciels et filtrons les courriels frauduleux. Avec Standard, rien de tout cela. Les applications, elles, sont les mêmes."),
+ mig:F("Transfert de la messagerie depuis GoDaddy","Adresses inchangées, historique conservé, sans interruption."),
+ mfa:F("Double vérification et protection anti-usurpation","Un mot de passe volé ne suffit plus, et personne ne peut écrire en votre nom."),
+ pwd:F("Coffre-fort de mots de passe","Les accès partagés cessent de circuler par messagerie."),
+ web:F("Reprise et supervision de vos sites","Sauvegarde quotidienne, correctifs, alerte en cas de coupure."),
+ form:F("Documentation et formation des équipes","Deux sessions et un dossier complet remis à l'institut.")
+}},
+{id:"3",t:"Sécurité et documents",s:"Chaque ligne modifie les deux montants.",f:{
+ backup:D("Sauvegarde de la messagerie","Le seul recours après une suppression ou un compte piraté.",
+  [["0","Non retenue"],["t","Par un prestataire indépendant"],["ms","Par Microsoft, au volume"]],"t",
+  "Microsoft s'engage à ce que le service fonctionne, pas à vous rendre vos données. Une suppression passée inaperçue quelques mois est définitive.<br><br>Par un prestataire indépendant, la copie est conservée hors de Microsoft et facturée par boîte. Par Microsoft, tout se pilote depuis la console d'administration et la restauration est immédiate, mais la copie reste chez Microsoft et la facturation se fait au volume chaque mois."),
+ share:D("Organisation et conservation des documents","Un espace par programme, des accès clairs, des durées de conservation.",
+  [["1","Comprise"],["0","Non retenue"]],"1",
+  "Les licences sont déjà dans votre abonnement. Ce qui est facturé, c'est le travail : un espace par programme, des accès explicites, la séparation du partage interne et externe, et les durées de conservation exigées par vos conventions de financement."),
+ sens:D("Sensibilisation des équipes","La majorité des incidents commence par un clic.",
+  [["1","Une session"],["2","Deux sessions et tests mensuels"],["0","Non retenue"]],"1",
+  "Une session couvre la reconnaissance d'un courriel frauduleux, la gestion des mots de passe et le réflexe à avoir en cas de doute.<br><br>La formule étendue ajoute une seconde session et, chaque mois, l'envoi au hasard de faux courriels piégés aux équipes. Nous mesurons qui clique et nous formons en priorité les personnes concernées, sans jamais les nommer devant les autres. C'est la seule méthode dont l'effet se mesure dans le temps."),
+ sign:D("Signature électronique","Pour faire signer des conventions à distance.",
+  [["0","Non retenue"],["1","Comprise"]],"0",
+  "À retenir si vous faites signer régulièrement. Sinon, l'impression et la signature scannée restent valables et gratuites.",
+  "Abonnement séparé par expéditeur. Les signataires n'en ont jamais besoin."),
+ dsUsers:N("Expéditeurs de documents à signer",null,0,0,100),
+ reseau:D("Cadrage de la connectivité du bureau","Lien internet, réseau local, secours électrique.",
+  [["0","Non retenu"],["1","Compris"]],"0",
+  "Nous mesurons la qualité du lien, examinons le réseau et le comportement en cas de coupure, puis remettons des recommandations chiffrées. Le matériel qui en découle vous est proposé au prix coûtant.")
+}},
+{id:"4",t:"Le service au quotidien",s:"Assistance illimitée et administration comprises dans tous les cas.",f:{
+ cap:D("Enveloppe de développement","Comprise dans le forfait de base à hauteur de dix heures par semaine.",
+  [["10","Dix heures par semaine"],["20","Vingt heures par semaine"],["0","Aucune, tout sur devis"]],"10",
+  "<b>Dix heures par semaine</b>, environ 43 heures par mois : trois à quatre nouvelles pages, ou un formulaire complet avec traitement des réponses, ou un appel à candidatures avec dépôt de dossiers, ou une lettre d'information montée et diffusée.<br><br><b>Vingt heures par semaine</b> permettent en plus de mener un vrai projet : espace partenaires, base de données consultable, ou refonte d'un site.<br><br>Les heures non utilisées ne se reportent pas d'un mois sur l'autre."),
+ jours:D("Jours de disponibilité",null,[["6","Du lundi au samedi"],["5","Du lundi au vendredi"],["7","Du lundi au dimanche"]],"6"),
+ heures:D("Plage horaire",null,[["n","De 9h à 18h GMT"],["u","De 9h à 18h GMT, plus les urgences en dehors"]],"n",
+  "La seconde option engage l'équipe à rester joignable au-delà des heures ouvrées et à traiter tout incident bloquant, hors jours fériés."),
+ inter:D("Passages au bureau",null,[["p","Ponctuels, à la demande"],["0","Tout à distance"],["m","Un passage par mois"],["h","Un passage par semaine"]],"p")
+}},
+{id:"5",t:"Claude",s:"Option.",f:{
+ iaSeats:N("Sièges","Deux au minimum. Zéro pour écarter l'option.",0,0,100),
+ iaAcc:D("Cadrage et formation",null,[["0","Licences seules"],["1","Avec cadrage et formation"]],"0",
+  "Sur un compte personnel, un rapport de partenaire ou une liste de bénéficiaires part dans un outil que l'institut ne contrôle pas, sans retrait possible au départ de la personne. Un compte au nom de l'institut règle la question.")
+}},
+{id:"6",t:"Ce que vous obtenez",s:"Récapitulatif de votre configuration actuelle.",f:{}}
+];
+
+const V={bill:"a",scen:"base"};
+G.forEach(g=>Object.entries(g.f).forEach(([k,f])=>{ if(f.ty!=="fx") V[k]=f.def; }));
+
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmt=n=>Math.round(n).toLocaleString('fr-FR').replace(/\u202f|\u00a0/g,' ');
+const $=i=>document.getElementById(i);
+const num=k=>parseFloat(V[k])||0;
+const v=k=>R[k].v;
+
+function ctrl(k,f){
+ if(f.ty==="fx") return `<div class="ctl">${f.val||"Compris"}</div>`;
+ if(f.ty==="num") return `<div class="ctl"><input id="in_${k}" type="number" min="${f.min}" max="${f.max}" value="${f.def}" oninput="V['${k}']=this.value;custom();go()"></div>`;
+ return `<div class="ctl"><select id="sel_${k}" onchange="V['${k}']=this.value;custom();go()">${f.o.map(([a,b])=>`<option value="${a}"${a===f.def?' selected':''}>${esc(b)}</option>`).join('')}</select></div>`;
+}
+$('form').innerHTML=G.map(g=>`<section class="blk${g.id==="6"?' blk-final':''}" id="sec${g.id}"><div class="hd2"><span class="letter">${g.id}</span><h2>${esc(g.t)}</h2></div><p class="sub">${esc(g.s)}</p>`+
+ (g.id==="6"?`<div id="reca"></div><div class="fin-arcs arc-orbit" aria-hidden="true"><span class="a-g"></span><span class="a-r"></span><span class="a-o"></span><span class="a-y"></span></div>`:
+ Object.entries(g.f).map(([k,f])=>`<div class="f${f.ty==='fx'?' fx':''}" id="row_${k}"><div class="lft"><div class="q">${esc(f.q)}</div>`+
+ (f.h?`<div class="h">${esc(f.h)}</div>`:'')+
+ (f.lic?`<div class="h" style="color:var(--agi-red);font-weight:500;margin-top:3px">${esc(f.lic)}</div>`:'')+
+ (f.why?`<details class="why"><summary>En savoir plus</summary><div class="body">${f.why}</div></details>`:'')+
+ `<div id="dl_${k}"></div><div id="al_${k}"></div></div>${ctrl(k,f)}</div>`).join(''))+`</section>`).join('');
+
+function applyScen(){
+ const p=SCEN[V.scen]; if(!p) return;
+ Object.entries(p).forEach(([k,val])=>{
+  V[k]=String(val);
+  const s=$('sel_'+k); if(s) s.value=String(val);
+  const i=$('in_'+k); if(i) i.value=val;
+ });
+}
+function custom(){ V.scen="custom"; $('sel_scen').value="custom"; }
+
+/* ---------- calcul ---------- */
+function calc(st){
+ const S=st||V;
+ const g=k=>parseFloat(S[k])||0;
+ const UP=[],M=[],A={};
+ const users=9, postes=g('postes'), sites=g('sites');
+ const seats=g('iaSeats'), seatsB=seats>0?Math.max(seats,2):0;
+ const dsU=S.sign==='1'?g('dsUsers'):0;
+ const prem=S.plan==='prem', annuel=S.bill==='a';
+ const fe=v('fxe'), fu=v('fxu'), mk=v('markup')/100;
+
+ UP.push(["Mise en place : transfert, sécurité, sites, documentation, formation",v('socle')]);
+ if(users>10) UP.push([`Boîtes au-delà de 10 (${users-10})`,(users-10)*v('boite')]);
+ if(sites>3) UP.push([`Sites au-delà de 3 (${sites-3})`,(sites-3)*v('siteS')]);
+ if(S.backup!=='0') UP.push(["Sauvegarde, mise en place",v('backupS')]);
+ if(S.share==='1')UP.push(["Organisation et conservation des documents",v('share')]);
+ if(S.sens==='1') UP.push(["Sensibilisation, une session",v('sens1')]);
+ if(S.sens==='2') UP.push(["Sensibilisation, deux sessions et tests mensuels",v('sens2')]);
+ if(S.sign==='1') UP.push(["Signature électronique, paramétrage",v('signS')]);
+ if(S.reseau==='1')UP.push(["Cadrage de la connectivité",v('reseau')]);
+ if(seatsB>0 && S.iaAcc==='1') UP.push([`Claude, cadrage et formation (${seatsB} sièges)`,v('iaB')+seatsB*v('iaS')]);
+
+ const nPl=Math.min(postes,users), nBa=Math.max(users-nPl,0);
+ const lics=[];
+ if(nPl>0) lics.push([`Microsoft 365 ${prem?'Business Premium':'Business Standard'} · ${nPl} postes administrés`, nPl*(prem?v('ePrem'):v('eStd'))*fe]);
+ if(nBa>0) lics.push([`Microsoft 365 Business Basic · ${nBa} comptes allégés`, nBa*v('eBas')*fe]);
+ lics.push([`Coffre-fort de mots de passe · ${users} personnes`, users*v('uPwd')*fu]);
+ if(S.backup==='t') lics.push([`Sauvegarde indépendante · ${users} boîtes`, users*v('uBackT')*fu]);
+ if(seatsB>0) lics.push([`Claude Team · ${seatsB} sièges`, seatsB*(annuel?v('uIAa'):v('uIAm'))*fu]);
+ if(dsU>0) lics.push([`Signature électronique · ${dsU} expéditeurs`, dsU*(annuel?v('eDsa'):v('eDsm'))*fe]);
+ const licM=lics.reduce((a,b)=>a+b[1],0);
+ if(annuel) lics.forEach(([l,a])=>UP.push([l+" · 12 mois",a*12*(1+mk)]));
+
+ M.push(["Forfait de base : administration, sécurité, supervision, assistance illimitée",v('base')]);
+ if(S.cap==='10') M.push(["Enveloppe de développement, dix heures par semaine",v('cap10')]);
+ if(S.cap==='20') M.push(["Enveloppe de développement, vingt heures par semaine",v('cap20')]);
+ if(S.jours==='5') M.push(["Disponibilité limitée au lundi-vendredi",v('j5')]);
+ if(S.jours==='7') M.push(["Ajout du dimanche",v('j7')]);
+ if(S.heures==='u') M.push(["Urgences traitées hors heures ouvrées",v('hUrg')]);
+ if(S.inter==='0') M.push(["Aucun passage au bureau",v('int0')]);
+ if(S.inter==='m') M.push(["Un passage par mois au bureau",v('intM')]);
+ if(S.inter==='h') M.push(["Un passage par semaine au bureau",v('intH')]);
+ if(users>12) M.push([`Personnes au-delà de 12 (${users-12})`,(users-12)*v('user')]);
+ if(sites>3) M.push([`Sites au-delà de 3 (${sites-3})`,(sites-3)*v('msite')]);
+ if(postes>12) M.push([`Ordinateurs au-delà de 12 (${postes-12})`,(postes-12)*v('mposte')]);
+ if(seatsB>0 && S.iaAcc==='1') M.push(["Administration Claude",v('mia')]);
+ let msB=0;
+ if(S.backup==='ms'){ msB=users*v('goUser')*v('uBackMs')*fu; M.push([`Sauvegarde Microsoft · environ ${users*v('goUser')} Go`,msB*(1+mk)]); }
+ if(!annuel) lics.forEach(([l,a])=>M.push([l,a*(1+mk)]));
+
+ if(sites!==3) A.sites="Nous exploitons trois sites aujourd'hui. Si vous en indiquez un nombre différent, dites-nous lesquels.";
+ if(S.sign==='1'&&dsU===0) A.dsUsers="Indiquez le nombre de personnes qui enverront des documents à signer.";
+ if(seats>0&&seats<2) A.iaSeats="Deux sièges au minimum. Le calcul en retient deux.";
+ if(!prem) A.plan="Nous recommandons Business Premium. En Standard, les ordinateurs ne peuvent être ni administrés à distance, ni verrouillés en cas de vol, et la protection contre les rançongiciels n'est pas fournie.";
+ if(S.backup==='0') A.backup="Nous recommandons de retenir ce module. C'est le seul recours après une suppression passée inaperçue ou un compte piraté ; Microsoft garantit le service, pas la restauration de vos contenus.";
+ if(S.share==='0') A.share="Nous recommandons de le retenir dès la première année. Reconstituer une arborescence après deux ans de désordre coûte plus cher que de la poser au départ.";
+ if(S.sens==='0') A.sens="Nous recommandons au moins une session. La majorité des incidents commence par un clic, pas par une faille technique.";
+ if(nBa>0) A.postes="Les "+nBa+" personnes sans ordinateur administré gardent un compte nominatif complet, avec double vérification et messagerie professionnelle. Elles travaillent dans le navigateur, sans installation ni copie locale de vos documents. Nous encadrons strictement ce périmètre au moment de la mise en place.";
+ if(S.cap==='0') A.cap="Sans enveloppe, chaque demande de développement passe par un devis préalable. C'est le choix le plus économique si vos besoins sont ponctuels, le plus lent s'ils ne le sont pas.";
+
+ const M2=M.filter(x=>Math.abs(x[1])>=1);
+ const licUp=annuel?licM*12:0;
+ return {UP,M:M2,A,licM,msB,licUp,presta:UP.reduce((a,b)=>a+b[1],0)-licUp*(1+mk),
+  sUP:UP.reduce((a,b)=>a+b[1],0),
+  sM:M2.reduce((a,b)=>a+b[1],0),
+  capH:(S.cap==='20'?20:S.cap==='10'?10:0)*4.33};
+}
+
+/* contribution de l'option retenue, sans comparer aux autres */
+function contrib(){
+ const cur=calc(), out={};
+ const keys=["plan","backup","share","sens","sign","reseau","cap","jours","heures","inter","iaAcc"];
+ keys.forEach(k=>{
+  const st=Object.assign({},V);
+  st[k]=({plan:"prem",backup:"0",share:"0",sens:"0",sign:"0",reseau:"0",cap:"0",jours:"6",heures:"n",inter:"p",iaAcc:"0"})[k];
+  if(k==="plan") st[k]="prem";
+  const ref=calc(st);
+  out[k]={up:cur.sUP-ref.sUP,m:cur.sM-ref.sM};
+ });
+ return {cur,out};
+}
+
+/* ---------- récapitulatif dynamique ---------- */
+function recap(){
+ const users=9, sites=num('sites');
+ const seats=num('iaSeats'), seatsB=seats>0?Math.max(seats,2):0;
+ const prem=V.plan==='prem';
+ const oui=[],non=[];
+ oui.push(`<b>Microsoft 365 ${prem?'Business Premium':'Business Standard'}</b> pour ${users} personnes`);
+ oui.push("Transfert de la messagerie depuis GoDaddy, sans interruption");
+ oui.push("Double vérification et protection contre l'usurpation de vos adresses");
+ if(prem){ oui.push("<b>Chiffrement des ordinateurs</b> et gestion du parc à distance");
+           oui.push("<b>Antivirus géré</b> et protection contre les rançongiciels"); }
+ else { non.push("Chiffrement imposé et gestion des ordinateurs à distance");
+        non.push("Antivirus géré et protection contre les rançongiciels"); }
+ oui.push("Coffre-fort de mots de passe pour l'institut");
+ oui.push(`Reprise et supervision de vos ${sites} sites`);
+ if(V.backup==='t') oui.push("<b>Sauvegarde indépendante</b> de la messagerie, hors de Microsoft");
+ else if(V.backup==='ms') oui.push("<b>Sauvegarde</b> de la messagerie par Microsoft");
+ else non.push("Sauvegarde de la messagerie");
+ if(V.share==='1') oui.push("<b>Organisation et conservation</b> de vos documents"); else non.push("Organisation et conservation des documents");
+ if(V.sens==='1') oui.push("<b>Une session</b> de sensibilisation des équipes");
+ else if(V.sens==='2') oui.push("<b>Deux sessions</b> de sensibilisation et faux courriels de test envoyés au hasard chaque mois");
+ else non.push("Sensibilisation des équipes");
+ if(V.sign==='1') oui.push(`<b>Signature électronique</b>, ${num('dsUsers')||0} expéditeurs`); else non.push("Signature électronique");
+ if(V.reseau==='1') oui.push("<b>Cadrage complet</b> de la connectivité du bureau"); else non.push("Cadrage de la connectivité du bureau");
+ if(seatsB>0) oui.push(`<b>Claude</b>, ${seatsB} sièges${V.iaAcc==='1'?', avec cadrage et formation':', licences seules'}`); else non.push("Claude");
+ oui.push(V.cap==='20'?"<b>Vingt heures par semaine</b> de développement réservées":
+          V.cap==='10'?"<b>Dix heures par semaine</b> de développement réservées":null);
+ if(V.cap==='0') non.push("Enveloppe de développement, tout passe par devis");
+ const j=V.jours==='7'?"sept jours sur sept":V.jours==='5'?"du lundi au vendredi":"du lundi au samedi";
+ oui.push(`Assistance illimitée, ${j}, de 9h à 18h GMT`);
+ if(V.heures==='u') oui.push("<b>Urgences traitées hors heures ouvrées</b>, hors jours fériés");
+ oui.push(V.inter==='h'?"<b>Un passage au bureau chaque semaine</b>":V.inter==='m'?"<b>Un passage au bureau chaque mois</b>":
+          V.inter==='0'?null:"Passages au bureau ponctuels, à la demande");
+ if(V.inter==='0') non.push("Passages au bureau");
+ oui.push("Documentation complète et formation des équipes");
+ return `<div class="reca"><div><h4>Compris</h4><ul>${oui.filter(Boolean).map(x=>`<li>${x}</li>`).join('')}</ul></div>`+
+  (non.length?`<div class="no"><h4>Non compris</h4><ul>${non.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`:'')+`</div>`;
+}
+
+/* ---------- rendu ---------- */
+function go(){
+ const {cur:q,out}=contrib();
+ $('vS').textContent=fmt(q.sUP);
+ $('vM').textContent=fmt(q.sM);
+ const pS=$('pvS'); if(pS){pS.textContent=fmt(q.sUP);$('pvM').textContent=fmt(q.sM);$('pvBill').textContent=$('sel_bill').selectedOptions[0].textContent;}
+ const li=([l,a])=>`<div class="li"><span class="l">${esc(l)}</span><span class="v">${fmt(a)}</span></div>`;
+ $('dS').innerHTML=q.UP.map(li).join('')+`<div class="li tot"><span class="l">Total</span><span class="v">${fmt(q.sUP)}</span></div>`
+  +`<div class="li mut" style="margin-top:6px"><span class="l">dont notre prestation</span><span class="v">${fmt(q.presta)}</span></div>`
+  +(q.licUp?`<div class="li mut"><span class="l">dont licences au coût réel</span><span class="v">${fmt(q.licUp)}</span></div>`
+   +`<div class="li mut"><span class="l">dont frais de gestion, ${v('markup')} %</span><span class="v">${fmt(q.licUp*v('markup')/100)}</span></div>`:'');
+ $('dM').innerHTML=q.M.map(li).join('')+`<div class="li tot"><span class="l">Total</span><span class="v">${fmt(q.sM)}</span></div>`
+  +`<div class="li mut"><span class="l">Première année</span><span class="v">${fmt(q.sUP+q.sM*12)}</span></div>`
+  +`<div class="li mut"><span class="l">Heure au-delà de l'enveloppe</span><span class="v">${fmt(v('hSup'))}</span></div>`;
+ $('reca').innerHTML=recap();
+
+ Object.entries(out).forEach(([k,d])=>{
+  const el=$('dl_'+k); if(!el) return;
+  const bits=[];
+  if(Math.abs(d.up)>=1) bits.push((d.up>0?'+ ':'− ')+fmt(Math.abs(d.up))+' à l\'engagement');
+  if(Math.abs(d.m)>=1) bits.push((d.m>0?'+ ':'− ')+fmt(Math.abs(d.m))+' par mois');
+  el.innerHTML=bits.length?`<span class="delta${(d.up+d.m)<0?' neg':''}">${bits.join(' · ')}</span>`
+   :`<span class="delta" style="color:var(--agi-olive)">Compris dans le forfait</span>`;
+ });
+ Object.keys(V).forEach(k=>{const el=$('al_'+k); if(el) el.innerHTML=q.A[k]?`<div class="alert">${q.A[k]}</div>`:'';});
+ ['backup','share','sens','sign','reseau','cap'].forEach(k=>{const e=$('sel_'+k); if(e) e.classList.toggle('off', V[k]==='0');});
+ const rd=$('row_dsUsers'); if(rd) rd.style.display=V.sign==='1'?'':'none';
+ const ra=$('row_iaAcc'); if(ra) ra.style.display=num('iaSeats')>0?'':'none';
+
+ if(document.body.classList.contains('adm')){
+  const mk=v('markup')/100, annuel=V.bill==='a';
+  const chg=v('cCousin')+v('cClaude')*v('cClaudeAll')/100+v('cOutils')+v('cDeplac');
+  const presta=q.sUP-(annuel?q.licM*12*(1+mk):0);
+  const honoM=q.sM-(annuel?0:q.licM*(1+mk))-q.msB*(1+mk);
+  const marge=honoM-chg;
+  const tSet=v('cHeures')>0?presta/v('cHeures'):0;
+  $('dCtl').innerHTML=
+   `<div class="li"><span class="l">Prestation à l'engagement</span><span class="v">${fmt(presta)}</span></div>`+
+   `<div class="li"><span class="l">Par heure sur ${v('cHeures')} h</span><span class="v" style="color:${tSet<12000?'#E8A79E':'var(--agi-yellow)'}">${fmt(tSet)}</span></div>`+
+   `<div class="li"><span class="l">Honoraires mensuels nets</span><span class="v">${fmt(honoM)}</span></div>`+
+   `<div class="li"><span class="l">Charges mensuelles</span><span class="v">${fmt(chg)}</span></div>`+
+   `<div class="li tot"><span class="l">Marge mensuelle</span><span class="v" style="color:${marge<80000?'#E8A79E':'var(--agi-yellow)'}">${fmt(marge)}</span></div>`+
+   `<div class="li mut"><span class="l">Marge sur licences, 12 mois</span><span class="v">${fmt((q.licM*12+q.msB*12)*mk)}</span></div>`+
+   (q.capH>0?`<div class="li mut"><span class="l">Recette horaire enveloppe</span><span class="v">${fmt(honoM/q.capH)}</span></div>`:'')+
+   `<div class="li mut"><span class="l">Marge année 1</span><span class="v">${fmt(marge*12+presta+(q.licM*12+q.msB*12)*mk)}</span></div>`;
+ }
+}
+if(location.hash.replace('#','')==='interne'){
+ document.body.classList.add('adm');
+ $('pgrid').innerHTML=Object.keys(R).map(k=>
+  `<div class="pr"><label>${esc(R[k].l)}</label><input type="number" step="any" value="${R[k].v}" oninput="R['${k}'].v=parseFloat(this.value)||0;go()"></div>`).join('');
+}
+V.scen='low'; applyScen(); V.scen='custom'; const _ss=$('sel_scen'); if(_ss) _ss.value='custom';
+go();
+
+/* sommaire actif au défilement */
+const somL=Array.from(document.querySelectorAll('.som a'));
+if(somL.length&&'IntersectionObserver'in window){
+ const spy=new IntersectionObserver(es=>{es.forEach(en=>{if(en.isIntersecting)somL.forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+en.target.id))})},{rootMargin:'-25% 0px -65% 0px'});
+ document.querySelectorAll('section.blk').forEach(s=>spy.observe(s));
+}
+
+/* ---------- accès par code ---------- */
+function getCookie(n){const m=document.cookie.match(new RegExp('(?:^|; )'+n+'=([^;]*)'));return m?decodeURIComponent(m[1]):null}
+function setCookie(n,val,days){const d=new Date();d.setTime(d.getTime()+days*86400000);document.cookie=n+'='+encodeURIComponent(val)+';expires='+d.toUTCString()+';path=/;SameSite=Lax'}
+function hasAccess(){let ls=null;try{ls=localStorage.getItem('iag_cfg_ok')}catch(e){}return getCookie('iag_cfg_ok')==='1'||ls==='1'}
+function saveAccess(){setCookie('iag_cfg_ok','1',400);try{localStorage.setItem('iag_cfg_ok','1')}catch(e){}}
+function clearAccess(){document.cookie='iag_cfg_ok=;Max-Age=0;path=/';try{localStorage.removeItem('iag_cfg_ok')}catch(e){}}
+const CODE='helloiag2026';
+const gateEl=$('gate'),appEl=$('app');
+function unlock(){appEl.hidden=false;gateEl.classList.add('gate-hide');setTimeout(()=>{gateEl.style.display='none'},320)}
+if(hasAccess()) unlock();
+$('gateForm').addEventListener('submit',function(e){
+ e.preventDefault();
+ const val=($('gateCode').value||'').trim().toLowerCase();
+ if(val===CODE){saveAccess();unlock()}
+ else{$('gateErr').textContent='Code incorrect.';$('gateCode').focus();$('gateCode').select()}
+});
+$('lockBtn').addEventListener('click',function(){
+ clearAccess();
+ appEl.hidden=true;gateEl.style.display='flex';gateEl.classList.remove('gate-hide');
+ const c=$('gateCode'); if(c){c.value='';c.focus()}
+ $('gateErr').textContent='';
+});
+</script>
+</body>
+</html>

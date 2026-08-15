@@ -20,6 +20,7 @@ from flask import (Blueprint, render_template, request, redirect, url_for,
                    flash, jsonify, send_from_directory, abort, current_app, Response)
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.utils import secure_filename
+from sqlalchemy import or_
 
 from config import Config
 from models import db, Article, User, TeamMember, Program, Resource, PublishLog, Application
@@ -300,18 +301,35 @@ def resource_delete(resource_id):
 _APP_STATUSES = ("new", "reviewed", "shortlisted", "rejected")
 
 
+_APP_SEARCH_COLS = ("nom", "prenom", "email", "telephone", "nationalite",
+                    "ville", "pays_residence", "organisation")
+_APP_PER_PAGE = 25
+
+
+def _applications_query(status, search):
+    """Requête filtrée (statut + recherche multi-champs), triée du plus récent."""
+    query = Application.query
+    if status in _APP_STATUSES:
+        query = query.filter_by(status=status)
+    if search:
+        like = f"%{search}%"
+        query = query.filter(or_(*[getattr(Application, c).ilike(like) for c in _APP_SEARCH_COLS]))
+    return query.order_by(Application.created_at.desc())
+
+
 @admin.route("/applications")
 @login_required
 def application_list():
-    q = Application.query.order_by(Application.created_at.desc())
     status = request.args.get("status", "")
-    if status in _APP_STATUSES:
-        q = q.filter_by(status=status)
-    applications = q.all()
+    search = request.args.get("q", "").strip()
+    page = request.args.get("page", 1, type=int)
+    pagination = _applications_query(status, search).paginate(
+        page=page, per_page=_APP_PER_PAGE, error_out=False)
     counts = {s: Application.query.filter_by(status=s).count() for s in _APP_STATUSES}
     counts["all"] = Application.query.count()
     return render_template("admin/application_list.html",
-                           applications=applications, counts=counts, current_status=status)
+                           pagination=pagination, applications=pagination.items,
+                           counts=counts, current_status=status, search=search)
 
 
 @admin.route("/applications/<int:app_id>")
@@ -375,7 +393,9 @@ def application_delete(app_id):
 @admin.route("/applications.csv")
 @login_required
 def application_export():
-    rows = Application.query.order_by(Application.created_at.desc()).all()
+    status = request.args.get("status", "")
+    search = request.args.get("q", "").strip()
+    rows = _applications_query(status, search).all()
     cols = ["id", "created_at", "status", "lang", "prenom", "nom", "email", "telephone",
             "date_naissance", "genre", "nationalite", "pays_residence", "ville",
             "tranche_age", "profession", "organisation", "langues", "statut", "domaines"]

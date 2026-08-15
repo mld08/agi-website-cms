@@ -30,6 +30,13 @@ class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-a-changer")
     SQLALCHEMY_DATABASE_URI = _database_url()
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    # Évite les erreurs 500 « MySQL server has gone away » : on teste la connexion
+    # avant chaque usage (reconnexion transparente) et on recycle les connexions
+    # avant que MySQL ne les ferme pour inactivité.
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        "pool_pre_ping": True,
+        "pool_recycle": 280,
+    }
 
     # Installation web sans terminal : jeton secret + identifiants du 1er admin.
     # Laissez SETUP_TOKEN vide pour DÉSACTIVER la page /setup (recommandé après install).

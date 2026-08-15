@@ -156,6 +156,22 @@ body{
 .text-bg-dark{background:var(--dark)!important;color:var(--cream)!important;}
 .text-bg-light{background:var(--cream-2)!important;color:var(--ink-2)!important;}
 
+/* ---- Pagination ---- */
+.pagination{
+  --bs-pagination-color:var(--agi-olive-dark);
+  --bs-pagination-hover-color:var(--agi-red);
+  --bs-pagination-hover-bg:var(--cream-2);
+  --bs-pagination-border-color:var(--line-2);
+  --bs-pagination-hover-border-color:var(--line-2);
+  --bs-pagination-focus-color:var(--agi-red);
+  --bs-pagination-focus-box-shadow:0 0 0 .2rem rgba(94,107,39,.18);
+  --bs-pagination-active-bg:var(--agi-olive);
+  --bs-pagination-active-border-color:var(--agi-olive);
+  --bs-pagination-active-color:#fff;
+  gap:4px;
+}
+.pagination .page-link{border-radius:.5rem;}
+
 /* ---- Alertes ---- */
 .alert{border-radius:.7rem;border:1px solid transparent;}
 .alert-success{background:#eef0e1;border-color:#cdd4ab;color:var(--agi-olive-deep);}
