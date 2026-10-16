@@ -4,7 +4,7 @@
 (function () {
   const form = document.getElementById('cff');
   if (!form) return;
-  const KEY = 'agi-cf-application-draft';
+  const KEY = form.dataset.draftKey || 'agi-cf-application-draft';
   const errBox = document.getElementById('cffError');
   const draftNote = document.getElementById('cffDraft');
 

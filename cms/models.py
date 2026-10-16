@@ -215,6 +215,13 @@ class Resource(db.Model):
         }
 
 
+# Appels Coastal Futures ouverts (code en base → libellé affiché dans l'admin).
+PROGRAMME_LABELS = {
+    "senegal": "Sénégal 2026",
+    "ghana": "Ghana 2026",
+}
+
+
 class Application(db.Model):
     """Une candidature soumise depuis le formulaire public (Coastal Futures)."""
     __tablename__ = "applications"
@@ -222,6 +229,9 @@ class Application(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     status = db.Column(db.String(20), nullable=False, default="new")  # new | reviewed | shortlisted | rejected
     lang = db.Column(db.String(2), default="fr")
+    # Appel d'origine (édition Coastal Futures par pays) : "senegal", "ghana", …
+    # Par défaut "senegal" → les candidatures antérieures restent rattachées au Sénégal.
+    programme = db.Column(db.String(20), default="senegal", index=True)
 
     # Champs principaux (recherche / affichage rapide).
     nom = db.Column(db.String(160), default="")
@@ -254,6 +264,10 @@ class Application(db.Model):
 
     def full_name(self):
         return f"{self.prenom} {self.nom}".strip() or self.email or f"Candidature #{self.id}"
+
+    def programme_label(self):
+        """Libellé lisible de l'appel (Sénégal 2026 / Ghana 2026)."""
+        return PROGRAMME_LABELS.get(self.programme, (self.programme or "").title())
 
     def files(self):
         """Renvoie [(label, champ, chemin), …] pour les pièces présentes."""

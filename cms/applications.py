@@ -32,8 +32,22 @@ _FILE_FIELDS = {
     "piece_identite": "identite_file",
     "piece_projet": "projet_file",
 }
-# Champs techniques à ignorer (hérités de FormSubmit).
-_SKIP = {"_honey", "_captcha", "_subject", "_template", "_next"}
+# Champs techniques à ignorer (hérités de FormSubmit + champ programme stocké en colonne).
+_SKIP = {"_honey", "_captcha", "_subject", "_template", "_next", "programme"}
+
+# Appels Coastal Futures acceptés (sinon on retombe sur "senegal").
+_PROGRAMMES = {"senegal", "ghana"}
+
+
+def _programme_from(form) -> str:
+    """Détermine l'appel d'origine : champ caché `programme`, repli sur le sujet."""
+    p = (form.get("programme", "") or "").strip().lower()
+    if p in _PROGRAMMES:
+        return p
+    subject = (form.get("_subject", "") or "").lower()
+    if "ghana" in subject:
+        return "ghana"
+    return "senegal"
 
 
 def register_apply_route(app, csrf):
@@ -47,7 +61,10 @@ def register_apply_route(app, csrf):
         if form.get("_honey", "").strip():
             return redirect(redirect_to, code=303)
 
-        app_row = Application(lang=("en" if "/en/" in form.get("_next", "") else "fr"))
+        app_row = Application(
+            lang=("en" if "/en/" in form.get("_next", "") else "fr"),
+            programme=_programme_from(form),
+        )
         for field in _TEXT_FIELDS:
             setattr(app_row, field, form.get(field, "").strip())
         for field in _MULTI_FIELDS:

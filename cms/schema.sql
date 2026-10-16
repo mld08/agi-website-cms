@@ -8,9 +8,10 @@ SET NAMES utf8mb4;
 CREATE TABLE IF NOT EXISTS applications (
 	id INTEGER NOT NULL AUTO_INCREMENT, 
 	created_at DATETIME, 
-	status VARCHAR(20) NOT NULL, 
-	lang VARCHAR(2), 
-	nom VARCHAR(160), 
+	status VARCHAR(20) NOT NULL,
+	lang VARCHAR(2),
+	programme VARCHAR(20),
+	nom VARCHAR(160),
 	prenom VARCHAR(160), 
 	email VARCHAR(190), 
 	telephone VARCHAR(60), 

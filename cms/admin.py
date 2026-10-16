@@ -23,7 +23,8 @@ from werkzeug.utils import secure_filename
 from sqlalchemy import or_
 
 from config import Config
-from models import db, Article, User, TeamMember, Program, Resource, PublishLog, Application
+from models import (db, Article, User, TeamMember, Program, Resource, PublishLog,
+                    Application, PROGRAMME_LABELS)
 from generator import build_site
 
 admin = Blueprint("admin", __name__, url_prefix="/admin")
@@ -303,12 +304,15 @@ _APP_STATUSES = ("new", "reviewed", "shortlisted", "rejected")
 
 _APP_SEARCH_COLS = ("nom", "prenom", "email", "telephone", "nationalite",
                     "ville", "pays_residence", "organisation")
+_APP_PROGRAMMES = ("senegal", "ghana")
 _APP_PER_PAGE = 25
 
 
-def _applications_query(status, search):
-    """Requête filtrée (statut + recherche multi-champs), triée du plus récent."""
+def _applications_query(status, search, programme=""):
+    """Requête filtrée (programme + statut + recherche multi-champs), triée du plus récent."""
     query = Application.query
+    if programme in _APP_PROGRAMMES:
+        query = query.filter_by(programme=programme)
     if status in _APP_STATUSES:
         query = query.filter_by(status=status)
     if search:
@@ -322,14 +326,23 @@ def _applications_query(status, search):
 def application_list():
     status = request.args.get("status", "")
     search = request.args.get("q", "").strip()
+    programme = request.args.get("programme", "")
     page = request.args.get("page", 1, type=int)
-    pagination = _applications_query(status, search).paginate(
+    pagination = _applications_query(status, search, programme).paginate(
         page=page, per_page=_APP_PER_PAGE, error_out=False)
-    counts = {s: Application.query.filter_by(status=s).count() for s in _APP_STATUSES}
-    counts["all"] = Application.query.count()
+    # Comptes par statut, restreints au programme sélectionné le cas échéant.
+    base = Application.query
+    if programme in _APP_PROGRAMMES:
+        base = base.filter_by(programme=programme)
+    counts = {s: base.filter_by(status=s).count() for s in _APP_STATUSES}
+    counts["all"] = base.count()
+    prog_counts = {p: Application.query.filter_by(programme=p).count() for p in _APP_PROGRAMMES}
+    prog_counts["all"] = Application.query.count()
     return render_template("admin/application_list.html",
                            pagination=pagination, applications=pagination.items,
-                           counts=counts, current_status=status, search=search)
+                           counts=counts, current_status=status, search=search,
+                           programmes=_APP_PROGRAMMES, prog_counts=prog_counts,
+                           programme_labels=PROGRAMME_LABELS, current_programme=programme)
 
 
 @admin.route("/applications/<int:app_id>")
@@ -395,8 +408,9 @@ def application_delete(app_id):
 def application_export():
     status = request.args.get("status", "")
     search = request.args.get("q", "").strip()
-    rows = _applications_query(status, search).all()
-    cols = ["id", "created_at", "status", "lang", "prenom", "nom", "email", "telephone",
+    programme = request.args.get("programme", "")
+    rows = _applications_query(status, search, programme).all()
+    cols = ["id", "created_at", "status", "programme", "lang", "prenom", "nom", "email", "telephone",
             "date_naissance", "genre", "nationalite", "pays_residence", "ville",
             "tranche_age", "profession", "organisation", "langues", "statut", "domaines"]
     buf = io.StringIO()

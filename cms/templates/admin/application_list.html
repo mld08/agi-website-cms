@@ -15,24 +15,35 @@
     <div class="page-eyebrow">Coastal Futures · Recrutement</div>
     <h1 class="mb-0">Candidatures</h1>
   </div>
-  <a class="btn btn-dark" href="{{ url_for('admin.application_export', status=current_status, q=search) }}">Exporter en CSV</a>
+  <a class="btn btn-dark" href="{{ url_for('admin.application_export', status=current_status, q=search, programme=current_programme) }}">Exporter en CSV</a>
+</div>
+
+<div class="mb-2 d-flex flex-wrap gap-2 align-items-center">
+  <span class="text-secondary small me-1">Appel :</span>
+  <a class="btn btn-sm {{ 'btn-dark' if not current_programme else 'btn-outline-dark' }}"
+     href="{{ url_for('admin.application_list', programme='', status=current_status, q=search) }}">Tous <span class="opacity-75">({{ prog_counts.all }})</span></a>
+  {% for p in programmes %}
+    <a class="btn btn-sm {{ 'btn-dark' if current_programme == p else 'btn-outline-dark' }}"
+       href="{{ url_for('admin.application_list', programme=p, status=current_status, q=search) }}">{{ programme_labels.get(p, p) }} <span class="opacity-75">({{ prog_counts.get(p, 0) }})</span></a>
+  {% endfor %}
 </div>
 
 <div class="mb-3 d-flex flex-wrap gap-2">
   {% set tabs = [('', 'Toutes', counts.all), ('new', 'Nouvelles', counts.new), ('reviewed', 'Examinées', counts.reviewed), ('shortlisted', 'Présélectionnées', counts.shortlisted), ('rejected', 'Écartées', counts.rejected)] %}
   {% for val, label, n in tabs %}
     <a class="btn btn-sm {{ 'btn-gold' if current_status == val else 'btn-outline-secondary' }}"
-       href="{{ url_for('admin.application_list', status=val, q=search) }}">{{ label }} <span class="opacity-75">({{ n }})</span></a>
+       href="{{ url_for('admin.application_list', status=val, q=search, programme=current_programme) }}">{{ label }} <span class="opacity-75">({{ n }})</span></a>
   {% endfor %}
 </div>
 
 <form class="mb-3" method="get" action="{{ url_for('admin.application_list') }}">
   <input type="hidden" name="status" value="{{ current_status }}">
+  <input type="hidden" name="programme" value="{{ current_programme }}">
   <div class="input-group" style="max-width:560px">
     <input class="form-control" type="search" name="q" value="{{ search }}"
            placeholder="Rechercher : nom, e-mail, téléphone, nationalité, ville, organisation…">
     <button class="btn btn-gold" type="submit">Rechercher</button>
-    {% if search %}<a class="btn btn-outline-secondary" href="{{ url_for('admin.application_list', status=current_status) }}">Effacer</a>{% endif %}
+    {% if search %}<a class="btn btn-outline-secondary" href="{{ url_for('admin.application_list', status=current_status, programme=current_programme) }}">Effacer</a>{% endif %}
   </div>
 </form>
 
@@ -49,6 +60,7 @@
         <tr>
           <th>Reçue le</th>
           <th>Candidat·e</th>
+          <th>Appel</th>
           <th>Contact</th>
           <th>Statut</th>
           <th>Pièces</th>
@@ -63,13 +75,14 @@
             <a class="text-decoration-none fw-semibold" href="{{ url_for('admin.application_detail', app_id=a.id) }}">{{ a.full_name() }}</a>
             <div class="text-secondary small">{{ a.nationalite }}{% if a.ville %} · {{ a.ville }}{% endif %}</div>
           </td>
+          <td><span class="badge {{ 'text-bg-success' if a.programme == 'ghana' else 'text-bg-primary' }}">{{ a.programme_label() }}</span></td>
           <td class="small">{{ a.email }}<div class="text-secondary">{{ a.telephone }}</div></td>
           <td>{{ status_badge(a.status) }}</td>
           <td><span class="badge text-bg-light text-dark">{{ a.files()|length }}</span></td>
           <td class="text-end"><a class="btn btn-sm btn-outline-secondary" href="{{ url_for('admin.application_detail', app_id=a.id) }}">Voir</a></td>
         </tr>
         {% else %}
-        <tr><td colspan="6" class="text-center text-secondary py-4">
+        <tr><td colspan="7" class="text-center text-secondary py-4">
           {% if search %}Aucune candidature ne correspond à «&nbsp;{{ search }}&nbsp;».{% else %}Aucune candidature.{% endif %}
         </td></tr>
         {% endfor %}
@@ -82,19 +95,19 @@
 <nav class="mt-3" aria-label="Pagination des candidatures">
   <ul class="pagination mb-0 flex-wrap">
     <li class="page-item {{ 'disabled' if not pagination.has_prev }}">
-      <a class="page-link" href="{{ url_for('admin.application_list', status=current_status, q=search, page=pagination.prev_num) }}">← Précédent</a>
+      <a class="page-link" href="{{ url_for('admin.application_list', status=current_status, q=search, programme=current_programme, page=pagination.prev_num) }}">← Précédent</a>
     </li>
     {% for p in pagination.iter_pages(left_edge=2, left_current=2, right_current=3, right_edge=2) %}
       {% if p %}
         <li class="page-item {{ 'active' if p == pagination.page }}">
-          <a class="page-link" href="{{ url_for('admin.application_list', status=current_status, q=search, page=p) }}">{{ p }}</a>
+          <a class="page-link" href="{{ url_for('admin.application_list', status=current_status, q=search, programme=current_programme, page=p) }}">{{ p }}</a>
         </li>
       {% else %}
         <li class="page-item disabled"><span class="page-link">…</span></li>
       {% endif %}
     {% endfor %}
     <li class="page-item {{ 'disabled' if not pagination.has_next }}">
-      <a class="page-link" href="{{ url_for('admin.application_list', status=current_status, q=search, page=pagination.next_num) }}">Suivant →</a>
+      <a class="page-link" href="{{ url_for('admin.application_list', status=current_status, q=search, programme=current_programme, page=pagination.next_num) }}">Suivant →</a>
     </li>
   </ul>
 </nav>

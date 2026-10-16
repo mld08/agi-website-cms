@@ -9,7 +9,9 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
   <div>
     <div class="page-eyebrow">Candidature reçue le {{ a.created_at.strftime('%d/%m/%Y à %H:%M') }} UTC</div>
-    <h1 class="mb-0">{{ a.full_name() }}</h1>
+    <h1 class="mb-0">{{ a.full_name() }}
+      <span class="badge align-middle fs-6 {{ 'text-bg-success' if a.programme == 'ghana' else 'text-bg-primary' }}">{{ a.programme_label() }}</span>
+    </h1>
   </div>
   <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('admin.application_list') }}">← Retour</a>
 </div>
